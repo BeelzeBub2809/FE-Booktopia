@@ -42,7 +42,7 @@ function Shop() {
         <div className='shop-container'>
             <Sidebar />
             <div className='products-container'>
-                <h2>Showing {productsAvailableList.length} products</h2>
+                <h2 className='total-product'>Showing {productsAvailableList.length} products</h2>
                 <div className="products-card-grid">
                     {currentProductsAvailableList.map(productdetails => (
                         <ProductCard key={productdetails._id} productdetails={productdetails} />

@@ -44,7 +44,7 @@ function Wishlist() {
 
     return (
         <div className="wishlist-container">
-            <h2>{userWishlist.length} {userWishlist.length === 1 ? "item" : "items"} in Wishlist</h2>
+            <h2 className='wishlist-total'>{userWishlist.length} {userWishlist.length === 1 ? "item" : "items"} in Wishlist</h2>
             <div className="products-card-grid">
                 {
                     userWishlist.length > 0 ? (

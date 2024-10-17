@@ -24,3 +24,8 @@
     justify-items: center;
     justify-content: space-evenly;
 }
+.total-product{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
