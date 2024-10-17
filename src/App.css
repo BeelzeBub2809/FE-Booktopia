@@ -31,9 +31,16 @@ html, body
     background-color: white;
 }
 
+.homepage-headings{
+    text-align: center;
+}
+
+.homepage-explore-all-btn{
+    text-align: center !important;
+}
+
 .App {
     min-height: 100%;
-    text-align: center;
     background-color: white;
     font-family: 'Comfortaa', cursive;
 }

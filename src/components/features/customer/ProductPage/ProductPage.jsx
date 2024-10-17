@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 import "./ProductPage.css";
-import { Star, User } from 'lucide-react';
+import { Star, User } from "lucide-react";
 import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg";
 
 function ProductPage() {
@@ -9,7 +9,8 @@ function ProductPage() {
   const imgAlt = "Book Cover";
   const bookName = "The Alchemist";
   const author = "Paulo Coelho";
-  const description = "A novel about a young shepherd named Santiago who travels from Spain to Egypt in search of treasure.";
+  const description =
+    "A novel about a young shepherd named Santiago who travels from Spain to Egypt in search of treasure.";
   const rating = 4.7;
   const discountedPrice = 299;
   const originalPrice = 499;
@@ -50,15 +51,21 @@ function ProductPage() {
   ];
 
   return (
-    <div className="product-page-container">
+    <div className="product-page-container container mt-5">
       <div className="product-page-item">
         <img className="bookcover-image" src={imgSrc} alt={imgAlt}></img>
         <div className="item-details">
           <h2>{bookName}</h2>
           <hr></hr>
-          <p><b>Author: </b> &nbsp;&nbsp; <span>{author}</span></p>
-          <p className="item-description"><b>Description: </b> &nbsp;&nbsp; <span>{description}</span></p>
-          <p className="item-rating"><b>Rating: </b> &nbsp;&nbsp; <span>{rating}</span></p>
+          <p>
+            <b>Author: </b> &nbsp;&nbsp; <span>{author}</span>
+          </p>
+          <p className="item-description">
+            <b>Description: </b> &nbsp;&nbsp; <span>{description}</span>
+          </p>
+          <p className="item-rating">
+            <b>Rating: </b> &nbsp;&nbsp; <span>{rating}</span>
+          </p>
           <h3 className="item-price-details">
             Rs. {discountedPrice} &nbsp;&nbsp;
             <del>Rs. {originalPrice}</del> &nbsp;&nbsp;
@@ -69,7 +76,9 @@ function ProductPage() {
           )}
           <div className="item-buttons">
             {outOfStock === true ? (
-              <button className="item-notify-me-btn solid-primary-btn">Notify Me</button>
+              <button className="item-notify-me-btn solid-primary-btn">
+                Notify Me
+              </button>
             ) : (
               <>
                 <button className="solid-primary-btn">Add to wishlist</button>
@@ -79,9 +88,45 @@ function ProductPage() {
           </div>
         </div>
       </div>
-      <h3>Related Books</h3>
+      <div class="container mt-5">
+        <h3>Product Reviews</h3>
+        <div class="review-list p-3">
+          <div class="review-item">
+            <div class="review-header">
+              <strong>John Doe</strong>
+              <span class="rating">⭐⭐⭐⭐</span>
+            </div>
+            <p>Great product! I highly recommend it.</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <strong>Jane Smith</strong>
+              <span class="rating">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p>I love this product. Works as expected.</p>
+          </div>
+        </div>
+        <h4>Write a Review</h4>
+        <form class="mt-3 p-3">
+          <div class="mb-3">
+            <label for="comment" class="form-label">
+              Your Comment
+            </label>
+            <textarea
+              class="form-control"
+              id="comment"
+              rows="3"
+              placeholder="Write your comment here"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Submit Review
+          </button>
+        </form>
+      </div>
+
       <div className="related-books-section">
-       
+        <h3>Related Books</h3>
         <div className="related-books-list">
           {relatedBooks.map((book, index) => (
             <div key={index} className="related-book-card">

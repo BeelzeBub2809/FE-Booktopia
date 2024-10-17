@@ -112,7 +112,6 @@
 }
 .related-books-section {
     padding: 20px;
-    background-color: #f9f9f9;
     border-radius: 8px;
     
   }
@@ -144,3 +143,20 @@
     font-size: 0.9rem;
     color: #555;
   }
+  .rating {
+    color: #f39c12;
+}
+.review-list {
+    margin-top: 20px;
+}
+.review-item {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.review-header {
+    justify-content: space-between;
+    align-items: center;
+}

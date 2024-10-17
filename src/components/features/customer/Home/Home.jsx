@@ -46,7 +46,7 @@ function Home() {
 
       <Link to={"/shop"}>
         <button 
-          className="solid-secondary-btn homepage-explore-all-btn">
+          className="solid-secondary-btn homepage-explore-all-btn" >
           Explore All
         </button>
       </Link>

@@ -38,14 +38,12 @@
 
 .homepage-explore-all-btn
 {
+   
     color: var(--pure-white);
     background-color: var(--red-color);
-}
-
-.homepage-explore-all-btn 
-{
-    background-position: center;
+    background-position: center ;
     transition: background 0.5s;
+    margin-left: 700px;
 }
 
 .homepage-explore-all-btn:hover 
@@ -60,7 +58,9 @@
     background-color: var(--red-color);
     background-size: 100%;
     transition: background 0s;
+
 }
+
 
 .new-arrivals-container
 {
