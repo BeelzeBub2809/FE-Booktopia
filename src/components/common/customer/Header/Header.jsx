@@ -1,9 +1,13 @@
 import React from 'react';
 import './Header.css';
 import { Link } from "react-router-dom";
-import { BsShopWindow, BsFillBagFill } from "react-icons/bs";
+import { BsShopWindow, BsFillBagFill, BsFillPersonFill } from "react-icons/bs";
+import UserProfileModal from '../../modal/userProfileModal';
 
 function Header() {
+  const [showProfileModal, setShowProfileModal] = React.useState(false);
+  const handleShowProfileModal = () => setShowProfileModal(true);
+  const handleCloseProfileModal = () => setShowProfileModal(false);
   return (
     <div className="top-bar">
       <div className="left-topbar-container">
@@ -22,7 +26,7 @@ function Header() {
         {/* Conditionally render Logout or Login button */}
         <button className="navbar-login-btn solid-primary-btn">Logout</button>
         
-        <Link to="/auth/login-res">
+        <Link to="/login-res">
           <button className="navbar-login-btn solid-primary-btn">Login</button>
         </Link>
 
@@ -60,7 +64,13 @@ function Header() {
             </div>
           </button>
         </Link>
+        <button className="icon-btn" onClick={handleShowProfileModal}>
+            <div className="icon-count-badge">
+              <BsFillPersonFill style={{ marginBottom: "4px" }} />
+            </div>
+          </button>
       </div>
+      <UserProfileModal showModal={showProfileModal} handleCloseModal={handleCloseProfileModal} />
     </div>
   );
 }

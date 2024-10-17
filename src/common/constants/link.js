@@ -1,4 +1,4 @@
 export const link = {
-  loginRes: '/auth/login-res',
-  forgotPass: '/auth/forgot-pass',
+  loginRes: '/login-res',
+  forgotPass: '/forgot-pass',
 }
