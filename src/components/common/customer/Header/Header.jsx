@@ -33,24 +33,26 @@ function Header() {
         <Link to="/shop">
           <button className="icon-btn">
             <div>
-              <BsShopWindow />
+            <i class="fa-solid fa-shop"></i>
             </div>
           </button>
         </Link>
 
         <Link to="/wishlist">
-          <button className="icon-btn">
+        <button className="icon-btn">
             <div className="icon-count-badge">
-              <i className="fa fa-heart-o fa-x" aria-hidden="true"></i>
-              <span className="count-badge-x">7</span>
+                <i className="fa fa-heart-o" aria-hidden="true" ></i>
+                
+                 <span className="count-badge-x">8</span>
+                
             </div>
-          </button>
-        </Link>
+        </button>
+    </Link>
 
         <Link to="/cart">
           <button className="icon-btn">
             <div className="icon-count-badge">
-              <i className="fa fa-shopping-cart fa-x" aria-hidden="true"></i>
+              <i className="fa fa-shopping-cart" aria-hidden="true"></i>
               <span className="count-badge-x">8</span>
             </div>
           </button>
@@ -66,7 +68,7 @@ function Header() {
         </Link>
         <button className="icon-btn" onClick={handleShowProfileModal}>
             <div className="icon-count-badge">
-              <BsFillPersonFill style={{ marginBottom: "4px" }} />
+            <i class="fa-solid fa-user"></i>
             </div>
           </button>
       </div>

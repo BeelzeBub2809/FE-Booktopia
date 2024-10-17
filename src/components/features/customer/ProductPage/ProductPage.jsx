@@ -36,34 +36,18 @@ function ProductPage() {
     },
   ];
 
-  const ReviewItem = ({ review }) => (
-    <div className="review-item mb-6 border-b pb-4">
-      <div className="flex items-center mb-2">
-        <User className="w-8 h-8 text-gray-400 mr-2" />
-        <div>
-          <h3 className="font-semibold">{review.reviewer}</h3>
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                fill={i < review.rating ? 'currentColor' : 'none'}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-      <p className="text-sm text-gray-600 mb-2">Reviewed in {review.location} on {review.date}</p>
-      {review.verifiedPurchase && (
-        <p className="text-sm text-orange-600 mb-2">Verified Purchase</p>
-      )}
-      <p className="mb-2">{review.comment}</p>
-      <div className="flex gap-2">
-        <button className="px-4 py-1 border border-gray-300 rounded-full text-sm">Helpful</button>
-        <button className="px-4 py-1 border border-gray-300 rounded-full text-sm">Report</button>
-      </div>
-    </div>
-  );
+  const relatedBooks = [
+    {
+      title: "Brida",
+      author: "Paulo Coelho",
+      imgSrc: bookCover,
+    },
+    {
+      title: "Veronika Decides to Die",
+      author: "Paulo Coelho",
+      imgSrc: bookCover,
+    },
+  ];
 
   return (
     <div className="product-page-container">
@@ -95,15 +79,22 @@ function ProductPage() {
           </div>
         </div>
       </div>
-      <div className="product-page-reviews mt-8">
-        <h3 className="text-2xl font-bold mb-4">Customer Reviews</h3>
-        {reviews.length > 0 ? (
-          reviews.map((review, index) => (
-            <ReviewItem key={index} review={review} />
-          ))
-        ) : (
-          <p>No reviews yet.</p>
-        )}
+      <h3>Related Books</h3>
+      <div className="related-books-section">
+       
+        <div className="related-books-list">
+          {relatedBooks.map((book, index) => (
+            <div key={index} className="related-book-card">
+              <img
+                className="related-book-image"
+                src={book.imgSrc}
+                alt={book.title}
+              />
+              <h4>{book.title}</h4>
+              <p>by {book.author}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
