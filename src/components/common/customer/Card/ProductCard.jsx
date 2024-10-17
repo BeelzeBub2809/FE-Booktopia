@@ -1,11 +1,15 @@
-import React from 'react';
-import './ProductCard.css';
-import bookCover from '../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg'; // Đảm bảo rằng đường dẫn này là chính xác.
+import React from "react";
+import "./ProductCard.css";
+import { Link } from "react-router-dom";
+import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg"; // Đảm bảo rằng đường dẫn này là chính xác.
 
 function ProductCard() {
   return (
     <div className="card-basic">
-      <img src={bookCover} alt="50 Shades of Grey" />
+      <Link to={`/shop/${1}`}>
+        <img src={bookCover} alt="50 Shades of Grey" />
+      </Link>
+
       <div className="card-item-details">
         <div className="item-title">
           <h4> Book_Covers</h4>
@@ -22,9 +26,6 @@ function ProductCard() {
           </button>
         </div>
         <div className="badge-on-card">hello</div>
-        <div className="card-text-overlay-container">
-          <p>Out of Stock</p>
-        </div>
       </div>
     </div>
   );

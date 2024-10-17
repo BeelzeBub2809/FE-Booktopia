@@ -21,8 +21,6 @@ export default function WishlistProductCard() {
   return (
     <Link 
       to={`/shop/${_id}`}  
-      
-      target="_blank"
       rel="noopener noreferrer"
     >
       <div className="card-basic wishlist-card">
