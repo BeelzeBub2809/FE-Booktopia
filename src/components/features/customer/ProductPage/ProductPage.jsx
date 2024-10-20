@@ -1,6 +1,5 @@
 import React from "react";
 import "./ProductPage.css";
-import { Star, User } from "lucide-react";
 import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg";
 
 function ProductPage() {

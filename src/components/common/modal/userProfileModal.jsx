@@ -53,8 +53,8 @@ export default function UserProfileModal({ showModal, handleCloseModal }) {
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Close</button>
-                  <button type="button" className="btn btn-success">Save</button>
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal} style={{backgroundColor: "gray"}}>Close</button>
+                  <button type="button" className="btn btn-success" style={{backgroundColor: "green"}}>Save</button>
                 </div>
               </div>
             </div>
