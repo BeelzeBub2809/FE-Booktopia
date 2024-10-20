@@ -67,7 +67,6 @@ function LoginAndRegister() {
                 </div>
 
                 <div className='d-flex justify-content-around'>
-                  <button className="btn btn-secondary btn-block mb-4">Close</button>
                   <button type="submit" className="btn btn-primary btn-block mb-4">Sign in</button>
                 </div>
 
@@ -123,7 +122,6 @@ function LoginAndRegister() {
                 </div>
 
                 <div className='d-flex justify-content-around'>
-                  <button className="btn btn-secondary btn-block mb-3">Close</button>
                   <button type="submit" className="btn btn-primary btn-block mb-3">Sign up</button>
                 </div>
               </form>
