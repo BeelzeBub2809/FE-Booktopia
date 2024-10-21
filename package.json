@@ -12,6 +12,7 @@
     "axios": "^1.7.7",
     "booktopia-fe": "file:",
     "bootstrap": "^5.3.3",
+    "cdbreact": "^1.5.19",
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.453.0",
