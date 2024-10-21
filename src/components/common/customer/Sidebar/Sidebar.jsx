@@ -1,7 +1,9 @@
-import React from "react";
+import {React, useState} from "react";
 import './Sidebar.css';
 
 function Sidebar({ genres,onGenreChange}) {
+  const [minPriceRange, setMinPriceRange] = useState(0);
+  const [maxPriceRange, setMaxPriceRange] = useState(1200);
   return (
     <aside className="product-page-sidebar">
       <div className="filter-clear-options">
@@ -10,46 +12,88 @@ function Sidebar({ genres,onGenreChange}) {
       </div>
 
       <div className="price-slider">
-        <p>Price</p>
-        <div className="price-input">
-          <div className="field">
-            <span>Min</span>
-            <input
-              type="number"
-              className="input-min"
-              max="10000"
-            />
-          </div>
-          <div className="separator">-</div>
-          <div className="field">
-            <span>Max</span>
-            <input
-              type="number"
-              className="input-max"
-              max="10000"
-            />
-          </div>
-        </div>
-        <div className="slider">
-          <div className="progress"></div>
-        </div>
-        <div className="range-input">
+      <p>Price</p>
+
+      <div className="price-input">
+        <div className="field">
+          <span>Min</span>
           <input
-            type="range"
-            className="range-min"
-            min="0"
-            max="1200"
-            step="50"
+            onChange={(e) => {
+              setMinPriceRange(e.target.value); 
+              if(maxPriceRange-e.target.value>100)
+              {
+                
+              }
+            }}
+            type="number"
+            className="input-min"
+            value={minPriceRange}
+            max="10000"
           />
+        </div>
+        <div className="separator">-</div>
+        <div className="field">
+          <span>Max</span>
           <input
-            type="range"
-            className="range-max"
-            min="0"
-            max="1200"
-            step="50"
+            onChange={(e) => {
+              setMaxPriceRange(e.target.value);
+              if(e.target.value-minPriceRange>100)
+              {
+                setMaxPriceRange(e.target.value); 
+                
+              }
+            }}
+            type="number"
+            className="input-max"
+            value={maxPriceRange}
+            max="10000"
           />
         </div>
       </div>
+
+      <div className="slider">
+        <div
+          className="progress"
+          style={{
+            left: (minPriceRange / 1200) * 100 + "%",
+            right: 100 - (maxPriceRange / 1200) * 100 + "%",
+          }}
+        ></div>
+      </div>
+
+      <div className="range-input">
+        <input
+          onChange={(e) => {
+            if(maxPriceRange-e.target.value>100)
+            {
+              setMinPriceRange(e.target.value); 
+             
+            }
+          }}
+          type="range"
+          className="range-min"
+          min="0"
+          max="1200"
+          value={minPriceRange}
+          step="50"
+        />
+        <input
+          onChange={(e) => {
+            if(e.target.value-minPriceRange>100)
+            {
+              setMaxPriceRange(e.target.value); 
+              
+            }
+          }}
+          type="range"
+          className="range-max"
+          min="0"
+          max="1200"
+          value={maxPriceRange}
+          step="50"
+        />
+      </div>
+    </div>
 
       <div className="product-category">
       <p>Category</p>
