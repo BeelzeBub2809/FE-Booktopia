@@ -1,24 +1,53 @@
-import React from "react";
-import "./ProductPage.css";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg";
+import "./ProductPage.css";
 
 function ProductPage() {
-  // Dữ liệu tĩnh cho sản phẩm
-  const imgSrc = bookCover;
-  const imgAlt = "Book Cover";
-  const bookName = "The Alchemist";
-  const author = "Paulo Coelho";
-  const description =
-    "A novel about a young shepherd named Santiago who travels from Spain to Egypt in search of treasure.";
-  const rating = 4.7;
-  const discountedPrice = 299;
-  const originalPrice = 499;
-  const discountPercent = 40;
-  const outOfStock = false;
+  const { id } = useParams(); // Get the product ID from the URL params
+  const [product, setProduct] = useState(null); // State to store product data
+  const [loading, setLoading] = useState(true); // State to track loading
+  const [error, setError] = useState(null); // State to track any errors
 
-  // Static reviews data
-  const reviews = [
-    {
+  // Fetch product data by ID
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`http://localhost:9999/api/product/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch product data.");
+        }
+        const data = await response.json();
+        setProduct(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!product) {
+    return <div>No product found.</div>;
+  }
+
+  // Destructure product data
+  const {
+    name,
+    author,
+    image,
+    price,
+    reviews = [ {
       reviewer: "John Doe",
       comment: "Amazing book! A must-read for everyone.",
       rating: 5,
@@ -33,111 +62,107 @@ function ProductPage() {
       date: "June 29, 2021",
       location: "United States",
       verifiedPurchase: true,
-    },
-  ];
-
-  const relatedBooks = [
-    {
-      title: "Brida",
-      author: "Paulo Coelho",
-      imgSrc: bookCover,
-    },
-    {
-      title: "Veronika Decides to Die",
-      author: "Paulo Coelho",
-      imgSrc: bookCover,
-    },
-  ];
+    }], // Default to empty array if undefined
+    relatedBooks = [
+      {
+        title: "Brida",
+        author: "Paulo Coelho",
+        imgSrc: bookCover,
+      },
+      {
+        title: "Veronika Decides to Die",
+        author: "Paulo Coelho",
+        imgSrc: bookCover,
+      },
+    ], // Default to empty array if undefined
+  } = product;
 
   return (
     <div className="product-page-container container mt-5">
       <div className="product-page-item">
-        <img className="bookcover-image" src={imgSrc} alt={imgAlt}></img>
+        <img className="bookcover-image" src={image} alt={name}></img>
         <div className="item-details">
-          <h2>{bookName}</h2>
+          <h2>{name}</h2>
           <hr></hr>
           <p>
             <b>Author: </b> &nbsp;&nbsp; <span>{author}</span>
           </p>
           <p className="item-description">
-            <b>Description: </b> &nbsp;&nbsp; <span>{description}</span>
+            <b>Description: </b> &nbsp;&nbsp; <span>This is a description test</span>
           </p>
           <p className="item-rating">
-            <b>Rating: </b> &nbsp;&nbsp; <span>{rating}</span>
+            <b>Rating: </b> &nbsp;&nbsp; <span>5</span>
           </p>
           <h3 className="item-price-details">
-            Rs. {discountedPrice} &nbsp;&nbsp;
-            <del>Rs. {originalPrice}</del> &nbsp;&nbsp;
-            <span className="discount-on-item">({discountPercent}% off)</span>
+            VND.100 &nbsp;&nbsp;
+            <del>VND {price}</del> &nbsp;&nbsp;
+            <span className="discount-on-item">(20% off)</span>
           </h3>
-          {outOfStock === true && (
-            <p className="out-of-stock-text">Item is currently out of stock</p>
-          )}
+
           <div className="item-buttons">
-            {outOfStock === true ? (
-              <button className="item-notify-me-btn solid-primary-btn">
-                Notify Me
-              </button>
-            ) : (
-              <>
-                <button className="solid-primary-btn">Add to wishlist</button>
-                <button className="solid-warning-btn">Add to cart</button>
-              </>
-            )}
+            <button className="solid-primary-btn">Add to wishlist</button>
+            <button className="solid-warning-btn">Add to cart</button>
           </div>
         </div>
       </div>
-      <div class="container mt-5">
+
+      {/* Reviews Section */}
+      <div className="container mt-5">
         <h3>Product Reviews</h3>
-        <div class="review-list p-3">
-          <div class="review-item">
-            <div class="review-header">
-              <strong>John Doe</strong>
-              <span class="rating">⭐⭐⭐⭐</span>
-            </div>
-            <p>Great product! I highly recommend it.</p>
-          </div>
-          <div class="review-item">
-            <div class="review-header">
-              <strong>Jane Smith</strong>
-              <span class="rating">⭐⭐⭐⭐⭐</span>
-            </div>
-            <p>I love this product. Works as expected.</p>
-          </div>
+        <div className="review-list p-3">
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <div key={index} className="review-item">
+                <div className="review-header">
+                  <strong>{review.reviewer}</strong>
+                  <span className="rating">{"⭐".repeat(review.rating)}</span>
+                </div>
+                <p>{review.comment}</p>
+              </div>
+            ))
+          ) : (
+            <p>No reviews available</p>
+          )}
         </div>
+
         <h4>Write a Review</h4>
-        <form class="mt-3 p-3">
-          <div class="mb-3">
-            <label for="comment" class="form-label">
+        <form className="mt-3 p-3">
+          <div className="mb-3">
+            <label htmlFor="comment" className="form-label">
               Your Comment
             </label>
             <textarea
-              class="form-control"
+              className="form-control"
               id="comment"
               rows="3"
               placeholder="Write your comment here"
             ></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" className="btn btn-primary">
             Submit Review
           </button>
         </form>
       </div>
 
+      {/* Related Books Section */}
       <div className="related-books-section">
         <h3>Related Books</h3>
         <div className="related-books-list">
-          {relatedBooks.map((book, index) => (
-            <div key={index} className="related-book-card">
-              <img
-                className="related-book-image"
-                src={book.imgSrc}
-                alt={book.title}
-              />
-              <h4>{book.title}</h4>
-              <p>by {book.author}</p>
-            </div>
-          ))}
+          {relatedBooks.length > 0 ? (
+            relatedBooks.map((book, index) => (
+              <div key={index} className="related-book-card">
+                <img
+                  className="related-book-image"
+                  src={book.imgSrc}
+                  alt={book.title}
+                />
+                <h4>{book.title}</h4>
+                <p>by {book.author}</p>
+              </div>
+            ))
+          ) : (
+            <p>No related books available</p>
+          )}
         </div>
       </div>
     </div>

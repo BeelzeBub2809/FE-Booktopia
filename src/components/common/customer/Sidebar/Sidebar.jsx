@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import './Sidebar.css'
+import React from "react";
+import './Sidebar.css';
 
-
-function Sidebar() {
-
-
+function Sidebar({ genres }) {
   return (
     <aside className="product-page-sidebar">
       <div className="filter-clear-options">
@@ -14,15 +11,12 @@ function Sidebar() {
 
       <div className="price-slider">
         <p>Price</p>
-
         <div className="price-input">
           <div className="field">
             <span>Min</span>
             <input
-             
               type="number"
               className="input-min"
-              
               max="10000"
             />
           </div>
@@ -30,39 +24,28 @@ function Sidebar() {
           <div className="field">
             <span>Max</span>
             <input
-             
               type="number"
               className="input-max"
-            
               max="10000"
             />
           </div>
         </div>
-
         <div className="slider">
-          <div
-            className="progress"
-           
-          ></div>
+          <div className="progress"></div>
         </div>
-
         <div className="range-input">
           <input
-            
             type="range"
             className="range-min"
             min="0"
             max="1200"
-            
             step="50"
           />
           <input
-          
             type="range"
             className="range-max"
             min="0"
             max="1200"
-         
             step="50"
           />
         </div>
@@ -70,63 +53,19 @@ function Sidebar() {
 
       <div className="product-category">
         <p>Category</p>
-        <div className="checkbox-item">
-          <input
-           
-            id="fiction-checkbox"
-            type="checkbox"
-            
-          />
-          <label htmlFor="fiction-checkbox">Fiction</label>
-        </div>
-
-        <div className="checkbox-item">
-          <input
-            id="thriller-checkbox"
-            type="checkbox"
-           
-          />
-          <label htmlFor="thriller-checkbox">Thriller</label>
-        </div>
-
-        <div className="checkbox-item">
-          <input
-            id="tech-checkbox"
-            type="checkbox"
-           
-          />
-          <label htmlFor="tech-checkbox">Tech</label>
-        </div>
-
-        <div className="checkbox-item">
-          <input
-            id="philosophy-checkbox"
-            type="checkbox"
-           
-          />
-          <label htmlFor="philosophy-checkbox">Philosophy</label>
-        </div>
-
-        <div className="checkbox-item">
-          <input
-            id="romance-checkbox"
-            type="checkbox"
-          />
-          <label htmlFor="romance-checkbox">Romance</label>
-        </div>
-
-        <div className="checkbox-item">
-          <input
-            id="manga-checkbox"
-            type="checkbox"
-          />
-          <label htmlFor="manga-checkbox">Manga</label>
-        </div>
+        {genres.map((genre) => (
+          <div className="checkbox-item" key={genre.id}>
+            <input
+              id={`${genre.name}-checkbox`}
+              type="checkbox"
+            />
+            <label htmlFor={`${genre.name}-checkbox`}>{genre.name}</label>
+          </div>
+        ))}
       </div>
 
       <div className="product-page-rating-radio">
         <p>Rating</p>
-
         <div className="rating-items">
           <input
             type="radio"
@@ -136,7 +75,6 @@ function Sidebar() {
           />
           <label htmlFor="4-stars-or-above">4 stars or above</label>
         </div>
-
         <div className="rating-items">
           <input
             type="radio"
@@ -146,7 +84,6 @@ function Sidebar() {
           />
           <label htmlFor="3-stars-or-above">3 stars or above</label>
         </div>
-
         <div className="rating-items">
           <input
             type="radio"
@@ -156,7 +93,6 @@ function Sidebar() {
           />
           <label htmlFor="2-stars-or-above">2 stars or above</label>
         </div>
-
         <div className="rating-items">
           <input
             type="radio"
@@ -165,13 +101,12 @@ function Sidebar() {
             value="1-stars-or-above"
             defaultChecked
           />
-          <label htmlFor="1-stars-or-above">1 stars or above</label>
+          <label htmlFor="1-stars-or-above">1 star or above</label>
         </div>
       </div>
 
       <div className="product-page-sortby-radio">
         <p>Sort By</p>
-
         <div className="sortby-items">
           <input
             type="radio"
@@ -181,7 +116,6 @@ function Sidebar() {
           />
           <label htmlFor="price-low-to-high">Price - Low to High</label>
         </div>
-
         <div className="sortby-items">
           <input
             type="radio"
@@ -195,7 +129,6 @@ function Sidebar() {
 
       <div className="additional-filters">
         <p>Additional filters</p>
-
         <div>
           <input
             id="out-of-stock-checkbox"
@@ -206,7 +139,6 @@ function Sidebar() {
             Include out of stock products
           </label>
         </div>
-
         <div>
           <input
             id="fast-delivery-available-checkbox"

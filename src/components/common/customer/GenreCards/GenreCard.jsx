@@ -2,13 +2,11 @@ import React from 'react'
 import './GenreCard.css'
 
 
-function GenreCard() {
-
-  
+function GenreCard({genre}) {
 
   return (
     <div  className='genre-card'>
-        <p>Category</p>
+        <p>{genre.name}</p>
     </div>
   )
 }
