@@ -6,6 +6,7 @@ import CustomerLayout from './layouts/customer/customerLayout.jsx'
 import { 
   Header
 } from "./index.js"
+import SaleLayout from './layouts/sale/saleLayout.jsx';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/*" exact element={<CustomerLayout/>} />
+          <Route path='/sale/*' element={<SaleLayout />} />
         </Routes>
       </div>
     </Router>

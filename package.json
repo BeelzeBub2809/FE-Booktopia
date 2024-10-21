@@ -12,6 +12,7 @@
     "axios": "^1.7.7",
     "booktopia-fe": "file:",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.453.0",
@@ -26,7 +27,9 @@
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
     "recharts": "^2.12.7",
-    "sweetalert2": "^11.12.2"
+    "simple-datatables": "^9.2.1",
+    "sweetalert2": "^11.12.2",
+    "tinymce": "^7.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
