@@ -1,7 +1,7 @@
 import React from "react";
 import './Sidebar.css';
 
-function Sidebar({ genres }) {
+function Sidebar({ genres,onGenreChange}) {
   return (
     <aside className="product-page-sidebar">
       <div className="filter-clear-options">
@@ -52,17 +52,18 @@ function Sidebar({ genres }) {
       </div>
 
       <div className="product-category">
-        <p>Category</p>
-        {genres.map((genre) => (
-          <div className="checkbox-item" key={genre.id}>
-            <input
-              id={`${genre.name}-checkbox`}
-              type="checkbox"
-            />
-            <label htmlFor={`${genre.name}-checkbox`}>{genre.name}</label>
-          </div>
-        ))}
-      </div>
+      <p>Category</p>
+      {genres.map((genre) => (
+        <div className="checkbox-item" key={genre.id}>
+          <input
+            id={`${genre.name}-checkbox`}
+            type="checkbox"
+            onChange={() => onGenreChange(genre._id)} // Pass genre ID
+          />
+          <label htmlFor={`${genre.name}-checkbox`}>{genre.name}</label>
+        </div>
+      ))}
+    </div>
 
       <div className="product-page-rating-radio">
         <p>Rating</p>
