@@ -14,7 +14,7 @@ function Header() {
         <Link to="/">
           <h2 className="top-bar-brand-name">Booktopia</h2>
         </Link>
-        <div className="search-bar">
+        <div className="search-bar1">
           <input
             className="search-bar-input"
             placeholder="Search"
