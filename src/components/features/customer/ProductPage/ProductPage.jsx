@@ -18,7 +18,7 @@ function ProductPage() {
           throw new Error("Failed to fetch product data.");
         }
         const data = await response.json();
-        setProduct(data);
+        setProduct(data.data);
       } catch (err) {
         setError(err.message);
       } finally {

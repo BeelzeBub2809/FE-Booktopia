@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 
 
 function ProductCard({ product }) {
-  console.log(product);
-
   return (
     <div className="card-basic">
       <Link to={`/shop/${product._id}`}>

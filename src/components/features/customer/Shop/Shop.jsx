@@ -21,12 +21,10 @@ function Shop() {
                 if (!genresResponse.ok) {
                     throw new Error("Failed to fetch genres.");
                 }
-
                 const productsData = await productsResponse.json();
                 const genresData = await genresResponse.json();
-
-                setProducts(productsData);
-                setGenres(genresData);
+                setProducts(productsData.data);
+                setGenres(genresData.data);
 
             } catch (error) {
                 console.error("Error fetching data:", error);

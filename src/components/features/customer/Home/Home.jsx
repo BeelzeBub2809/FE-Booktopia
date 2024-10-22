@@ -31,7 +31,7 @@ function Home() {
     fetch("http://localhost:9999/api/category")
       .then(response => response.json())
       .then(data => {
-        setGenre(data); // Set the fetched products to state
+        setGenre(data.data); // Set the fetched products to state
         setLoading(false); // Set loading to false after data is fetched
       })
       .catch(error => {
@@ -47,7 +47,7 @@ function Home() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
- 
+  console.log(genre);
   return (
     <div className='home-component-container'>
       <div className='home-page-img-container'>
