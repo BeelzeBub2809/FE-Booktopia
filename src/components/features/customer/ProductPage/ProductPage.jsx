@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg";
 import "./ProductPage.css";
+import CartService from "../../../../services/cart/cartService";
+import Swal from "sweetalert2";
 
 function ProductPage() {
   const { id } = useParams(); // Get the product ID from the URL params
@@ -77,6 +79,25 @@ function ProductPage() {
     ], // Default to empty array if undefined
   } = product;
 
+
+  const handleAddToCart = async(productId) => {
+    try {
+      const res = await CartService.addToCart({ productId });
+      Swal.fire({
+        title: 'Success',
+        text: res.message,
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: 'Ok',
+      });
+    }
+  }
   return (
     <div className="product-page-container container mt-5">
       <div className="product-page-item">
@@ -101,7 +122,7 @@ function ProductPage() {
 
           <div className="item-buttons">
             <button className="solid-primary-btn">Add to wishlist</button>
-            <button className="solid-warning-btn">Add to cart</button>
+            <button className="solid-warning-btn" onClick={() => handleAddToCart(product._id)}>Add to cart</button>
           </div>
         </div>
       </div>

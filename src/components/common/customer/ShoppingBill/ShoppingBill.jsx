@@ -1,7 +1,9 @@
 import "./ShoppingBill.css";
 import React from "react";
 
-function ShoppingBill() {
+function ShoppingBill({cartItems}) {
+  console.log(cartItems);
+  
   // Dữ liệu tĩnh cho giỏ hàng
   const userCart = [
     {
@@ -32,17 +34,17 @@ function ShoppingBill() {
       <h2 className="bill-heading">Bill Details</h2>
 
       <hr />
-      {userCart.map((product) => {
+      {cartItems.map((cartItem) => {
         return (
-          <div key={product._id} className="cart-price-container">
+          <div key={cartItem.productId._id} className="cart-price-container">
             <div className="cart-item-bookname">
-              <p>{product.bookName}</p>
+              <p>{cartItem.productId.name}</p>
             </div>
             <div className="cart-item-quantity">
-              <p>X {product.quantity}</p>
+              <p>X {cartItem.amount}</p>
             </div>
             <div className="cart-item-total-price" id="price-sum">
-              <p>&#8377;{product.discountedPrice * product.quantity}</p>
+              <p>{cartItem.productId.price * cartItem.amount} VND</p>
             </div>
           </div>
         );

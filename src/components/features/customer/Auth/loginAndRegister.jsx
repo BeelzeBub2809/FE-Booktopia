@@ -1,10 +1,76 @@
 import { useState } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { ValidatorsControl } from '../../../../utils/validators-control';
+import { Rules } from '../../../../utils/rules';
+import AuthService from '../../../../services/auth/loginService';
+
 
 function LoginAndRegister() {
   // Define state to track the active tab (login or register)
   const [activeTab, setActiveTab] = useState('login');
+  const navigation = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  let formControl = new ValidatorsControl({
+    username: { value: username, validators: Rules.noValidate }, // Use username instead of email
+    password: { value: password, validators: Rules.password },
+  });
+  const rolePriority = ['customer', 'marketer', 'sale', 'admin'];
 
+  const handleRedirect = (roles) => {
+    const highestRole = roles.reduce((highest, role) => {
+      if (rolePriority.indexOf(role) > rolePriority.indexOf(highest)) {
+        return role;
+      }
+      return highest;
+    }, 'customer');
+
+    switch (highestRole) {
+      case 'customer':
+        navigation('/');
+        window.location.reload();
+        break;
+      case 'marketer':
+        navigation('/marketer');
+        window.location.reload();
+        break;
+      case 'sale':
+        navigation('/sale');
+        window.location.reload();
+        break;
+      case 'admin':
+        navigation('/admin');
+        window.location.reload();
+        break;
+      default:
+        navigation('/');
+        window.location.reload();
+        break;
+    }
+  };
+
+  const handleSubmitLoginForm = async (e) => {
+    let isSubmit = formControl.submitForm(e);
+    if (isSubmit) {
+      try {
+        const response = await AuthService.login(username, password);
+        console.log(response);
+        const roles = response.data.roles;
+        localStorage.setItem('userRoles', JSON.stringify(roles));
+        localStorage.setItem('userId', JSON.stringify(response.data.id));
+        handleRedirect(roles);
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message,
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      }
+    }
+  };
   return (
     <div className='container min-vh-100 position-relative'>
       <div className="container border border-primary shadow p-3 mb-5 bg-body rounded position-absolute top-50 start-50 translate-middle" style={{ width: '40%' }}>
@@ -44,13 +110,13 @@ function LoginAndRegister() {
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="loginName">Email</label>
-                  <input type="email" id="loginName" className="form-control" />
+                  <label className="form-label">User Name</label>
+                  <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)}/>
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
                   <label className="form-label" htmlFor="loginPassword">Password</label>
-                  <input type="password" id="loginPassword" className="form-control" />
+                  <input type="password" id="loginPassword" className="form-control" onChange={(e) => setPassword(e.target.value)}/>
                 </div>
 
                 <div className="row mb-4">
@@ -67,11 +133,7 @@ function LoginAndRegister() {
                 </div>
 
                 <div className='d-flex justify-content-around'>
-                  <button type="submit" className="btn btn-primary btn-block mb-4">Sign in</button>
-                </div>
-
-                <div className="text-center">
-                  <p>Not a member? <a href="#!">Register</a></p>
+                  <button type="submit" className="btn btn-primary btn-block mb-4" onClick={(e) => handleSubmitLoginForm(e)}>Sign in</button>
                 </div>
               </form>
             </div>
@@ -89,28 +151,38 @@ function LoginAndRegister() {
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerName">Name</label>
+                  <label className="form-label" htmlFor="registerName">Name<span className="text-danger">*</span></label>
                   <input type="text" id="registerName" className="form-control" />
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerUsername">Username</label>
+                  <label className="form-label" htmlFor="registerUsername">Username<span className="text-danger">*</span></label>
                   <input type="text" id="registerUsername" className="form-control" />
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerEmail">Email</label>
+                  <label className="form-label" htmlFor="registerEmail">Email<span className="text-danger">*</span></label>
                   <input type="email" id="registerEmail" className="form-control" />
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerPassword">Password</label>
+                  <label className="form-label" htmlFor="registerPassword">Password<span className="text-danger">*</span></label>
                   <input type="password" id="registerPassword" className="form-control" />
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerRepeatPassword">Repeat password</label>
+                  <label className="form-label" htmlFor="registerRepeatPassword">Repeat password<span className="text-danger">*</span></label>
                   <input type="password" id="registerRepeatPassword" className="form-control" />
+                </div>
+
+                <div className="form-outline mb-4 d-flex flex-column text-start">
+                  <label className="form-label">Phone<span className="text-danger">*</span></label>
+                  <input type="text" className="form-control" />
+                </div>
+
+                <div className="form-outline mb-4 d-flex flex-column text-start">
+                  <label className="form-label">Address</label>
+                  <input type="text" className="form-control" />
                 </div>
 
                 <div className="form-check d-flex justify-content-center mb-4">
