@@ -22,6 +22,8 @@ function NewArrivals() {
     fetch("http://localhost:9999/api/product")
       .then(response => response.json())
       .then(data => {
+        console.log(data.data);
+        
         setProducts(data.data); // Set the fetched products to state
         setLoading(false); // Set loading to false after data is fetched
       })

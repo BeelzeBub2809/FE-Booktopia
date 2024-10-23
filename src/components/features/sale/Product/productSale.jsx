@@ -50,13 +50,12 @@ function ProductSale() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:9999/api/product/all", {
-      method: 'POST',
+    fetch("http://localhost:9999/api/product", {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-      })
+      credentials: 'include'
     })
       .then(response => response.json())
       .then(data => {
@@ -110,7 +109,7 @@ function ProductSale() {
                   </thead>
                   <tbody>
                    {
-                    data.map((p, index) => (
+                    data?.map((p, index) => (
                         <tr key={index}>
                           <td>{p.isbn}</td>
                           <td>{p.name}</td>
