@@ -1,110 +1,160 @@
-.product-page-item
-{
+/* General container for product */
+.product-page-item {
     width: 100%;
     min-height: calc(100vh - 10.7rem);
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 2rem;
+    background-color: #f9f9f9;
 }
 
-.product-page-item
-{
-    min-width: 80%;
+/* Inner container for product details */
+.product-page-item {
+    width: 80%;
     min-height: 80%;
-    padding: 1rem 5rem 3rem 5rem;
+    padding: 2rem;
     display: flex;
-    gap: 3rem;
+    gap: 2.5rem;
+    background-color: white;
+    border-radius: 8px;
 }
 
-@media only screen and (max-width: 1018px)
-{
-    .item-author, .item-rating
-    {
+/* Responsive breakpoints */
+@media only screen and (max-width: 1018px) {
+    .item-author, .item-rating {
         margin-top: 8px;
         margin-bottom: 8px;
     }
 }
 
-@media only screen and (max-width: 945px)
-{
-    .product-page-item
-    {
+@media only screen and (max-width: 945px) {
+    .product-page-item {
         flex-direction: column;
         align-items: center;
     }
 
-    .item-buttons
-    {
+    .item-buttons {
         flex-direction: column;
         margin-top: 1.6rem;
         align-items: stretch;
     }
 
-    .item-buttons button
-    {
+    .item-buttons button {
         width: 100%;
     }
 }
 
-.bookcover-image
-{
+/* Styling for the book cover image */
+.bookcover-image {
     height: 40rem;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.item-details
-{
-    min-height: 100%;
-    max-width: 80rem;
-    width: fit-content;
+.bookcover-thumbnail{
+    height: 20rem;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Product details container */
+.product-details-section {
+    width: 100%;
+    max-width: 60rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0rem 4rem 0rem 4rem;
-    flex-grow: 1;
+    padding: 0 2rem;
 }
 
-.item-details hr
-{
+/* Horizontal line for separation */
+.product-details-section hr {
     width: 100%;
+    border: 1px solid #e0e0e0;
+    margin: 1rem 0;
 }
 
-.item-description
-{
-    text-align: left;
-    margin: 0;
+/* Styling for product description */
+.product-description, .product-rating {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #555;
 }
 
-.item-price-details
-{
-    margin: 0;
+/* Price details styling */
+.product-price {
+    margin: 1rem 0;
+    font-size: 1.8rem;
+    color: #333;
+    display: flex;
+    align-items: center;
 }
 
-.discount-on-item
-{
-    color: var(--notification-or-error);
-    font-size: 14px;
+/* Discounted price styling */
+.discount {
+    color: #d9534f;
+    font-size: 1.2rem;
+    margin-left: 1rem;
 }
 
-.item-buttons
-{
+/* Button container */
+.product-action-buttons {
     width: 100%;
-    flex-grow: 1;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    gap: 1rem;
+    gap: 1.2rem;
+    margin-top: 2rem;
 }
 
-.item-buttons button
-{
+/* Button styles */
+.product-action-buttons button {
     flex-grow: 1;
-    margin: 0;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-.out-of-stock-text
-{
-    color: var(--red-color);
+.solid-primary-btn {
+    background-color: #007bff;
+    color: white;
 }
+
+.solid-warning-btn {
+    background-color: #ffc107;
+    color: white;
+}
+
+/* Out of stock text */
+.out-of-stock-text {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+/* Responsive: Adjustments for smaller screens */
+@media only screen and (max-width: 600px) {
+    .item-details {
+        padding: 0 1rem;
+    }
+
+    .bookcover-image {
+        height: 30rem;
+    }
+
+    .item-price-details {
+        font-size: 1.5rem;
+    }
+
+    .item-buttons {
+        flex-direction: column;
+    }
+}
+
 
 .item-notify-me-btn
 {
@@ -160,3 +210,124 @@
     justify-content: space-between;
     align-items: center;
 }
+
+
+  
+
+  .product-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .main-image-container {
+
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .main-image {
+    max-height: 40rem;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .thumbnail-container {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .thumbnail-image {
+    height: 10rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+    object-fit: cover;
+    cursor: pointer;
+  }
+  
+  .product-details-section {
+    max-width: 400px;
+  }
+  
+  .product-name {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .product-author,
+  .product-description,
+  .product-rating {
+    margin-bottom: 8px;
+  }
+  
+  .product-price {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .discount {
+    color: red;
+  }
+  
+  .product-action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .btn-warning {
+    background-color: #ffc107;
+    color: white;
+  }
+  
+
+  .image-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the controls */
+  }
+  
+  .btn-image {
+    background: none; /* Remove default button styling */
+    border: none; /* Remove border */
+    cursor: pointer; /* Change cursor to pointer */
+    padding: 10px; /* Add some padding */
+    margin: 0 10px; /* Space between buttons */
+    color: #333; /* Set icon color */
+    font-size: 24px; /* Increase icon size */
+  }
+  
+  .btn-image:disabled {
+    opacity: 0.5; /* Change opacity when disabled */
+    cursor: not-allowed; /* Change cursor to not-allowed */
+  }
+  
+  .thumbnail-container {
+    display: flex; /* Use flexbox for thumbnails */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    padding: 10px 0; /* Add padding */
+  }
+  
+  .thumbnail-image {
+    width: 50px; /* Set thumbnail size */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 5px; /* Space between thumbnails */
+    cursor: pointer; /* Change cursor to pointer */
+  }
+  
+  .active-thumbnail {
+    border: 2px solid #007bff; /* Highlight active thumbnail */
+  }
+  

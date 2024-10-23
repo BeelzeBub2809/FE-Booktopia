@@ -47,7 +47,6 @@ function Home() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  console.log(genre);
   return (
     <div className='home-component-container'>
       <div className='home-page-img-container'>
