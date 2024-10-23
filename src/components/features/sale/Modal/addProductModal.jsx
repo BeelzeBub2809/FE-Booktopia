@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment } from 'react';
 import LoadingLottie from "../../../../Assets/Lottie/loading-0.json"; 
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
+import ProductService from '../../../../services/product/productService';
 
 export default function AddProductModal({ showModal, handleCloseModal }) {
   const [imagePreview, setImagePreview] = useState('https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg');
@@ -11,14 +12,15 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
   const [authors, setAuthors] = useState([]);
   const [product, setProduct] = useState({
     isbn: '',
-    author: '',
+    author: [],
     name: '',
     price: 0,
     quantityInStock: 0,
     publisher: '',
     categoryId: [],
     description: '',
-    releaseDate: '',  
+    releaseDate: '',
+    status: 'active',
   });
 
   const loadingObj = {
@@ -88,41 +90,35 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(value);
     
     setProduct({ ...product, [name]: value });
   };
 
   const handleSubmit = async () => {
-      await fetch("http://localhost:9999/api/product", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(product)
-      })
-      .then(response => response.json())
-      .then(data => {
-          Swal.fire({
-            title: `Create product successfully`,
-            icon: 'success',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            confirmButtonText: 'Ok',
-        }).then(() => {
-            handleCloseModal();
-        })
-      })
-      .catch(error => {
-        Swal.fire({
-          title: 'Error',
-          text: error.message,
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-          handleCloseModal();
-        });
+    try {
+      const res = await ProductService.createProduct({...product, author: authors});
+      Swal.fire({
+        title: `successfully`,
+        text: res.message,
+        icon: 'success',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        confirmButtonText: 'Ok',
+      }).then(() => {
+        handleCloseModal();
+      }).then(() => {
+        window.location.reload();
       });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      }).then(() => {
+        handleCloseModal();
+      });
+    }
   };
 
   return (
@@ -223,7 +219,7 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                   <div style = {{ marginRight: "10px",  marginLeft: "10px"}}>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Description</label>
-                        <textarea className="form-control" name="description" value={product.description} onChange={handleChange}></textarea>
+                        <textarea className="form-control" name="description" value={product.description} onChange={handleChange} placeholder='Let input the fact of product'></textarea>
                       </div>
                     </div>
                 </div>

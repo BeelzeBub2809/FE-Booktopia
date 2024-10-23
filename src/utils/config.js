@@ -1,0 +1,1 @@
+export const ROOT_DOMAIN = "http://localhost:9999/api"
