@@ -13,14 +13,14 @@ function SideBarEmp() {
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="#">
+          <a class="nav-link collapsed" href="/sale/product">
             <i class="bi bi-book"></i>
             <span>Product</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link collapsed" href="#">
+          <a class="nav-link collapsed" href="/sage/category">
             <i class="bi bi-bookmarks"></i>
             <span>Category</span>
           </a>

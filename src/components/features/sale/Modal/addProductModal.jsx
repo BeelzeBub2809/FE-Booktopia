@@ -1,17 +1,78 @@
-import { useState } from 'react';
+import { useState, useEffect, Fragment } from 'react';
+import LoadingLottie from "../../../../Assets/Lottie/loading-0.json"; 
+import Lottie from "react-lottie"; // Lottie for animation
+import Swal from 'sweetalert2';
 
 export default function AddProductModal({ showModal, handleCloseModal }) {
   const [imagePreview, setImagePreview] = useState('https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg');
+  const [category, setCategory] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [selectedCategories, setSelectedCategories] = useState('');
+  const [authors, setAuthors] = useState([]);
   const [product, setProduct] = useState({
     isbn: '',
-    name: '',
-    price: '',
-    quantityInStock: '',
-    publisher: '',
     author: '',
-    categoryId: '',
-    image: ''
+    name: '',
+    price: 0,
+    quantityInStock: 0,
+    publisher: '',
+    categoryId: [],
+    description: '',
+    releaseDate: '',  
   });
+
+  const loadingObj = {
+    loop: true,
+    autoplay: true,
+    animationData: LoadingLottie,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:9999/api/category")
+      .then(response => response.json())
+      .then(data => {
+        setCategory(data.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching products:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
+    const selectedCategories = product.categoryId;
+
+    if (checked) {
+      selectedCategories.push(value);
+    } else {
+      const index = selectedCategories.indexOf(value);
+      if (index > -1) {
+        selectedCategories.splice(index, 1);
+      }
+    }
+    setProduct({ ...product, categoryId: selectedCategories });
+  };
+
+  const handleAddAuthor = () => {
+    setAuthors([...authors, '']);
+  };
+
+  const handleRemoveAuthor = (index) => {
+    const newAuthor = authors.filter((_, i) => i !== index);
+    setAuthors(newAuthor);
+  };
+
+  const handleInputChange = (index, event) => {
+    const { value } = event.target;
+    const newAuthors = [...authors];
+    newAuthors[index] = value;
+    setAuthors(newAuthors);
+};
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -27,12 +88,41 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(value);
+    
     setProduct({ ...product, [name]: value });
   };
 
-  const handleSubmit = () => {
-    // Add your logic to post the product to the database here
-    console.log(product);
+  const handleSubmit = async () => {
+      await fetch("http://localhost:9999/api/product", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(product)
+      })
+      .then(response => response.json())
+      .then(data => {
+          Swal.fire({
+            title: `Create product successfully`,
+            icon: 'success',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            confirmButtonText: 'Ok',
+        }).then(() => {
+            handleCloseModal();
+        })
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Error',
+          text: error.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          handleCloseModal();
+        });
+      });
   };
 
   return (
@@ -49,10 +139,39 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                 <div className="modal-body">
                   <div className="d-flex" style={{ gap: '20px' }}>
                     <div className='d-flex' style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
-                      <img src={imagePreview} alt="Product" className="avatar" style={{ width: '40%' }} />
-                      <div className="mt-3">
-                        <label className="form-label text-dark">Upload Image</label>
-                        <input type="file" className="form-control" accept="image/png, image/jpeg" onChange={handleImageChange} />
+                      <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
+                        <img src={imagePreview} alt="Product" className="avatar" style={{ width: '40%' }} />
+                        <div className="mt-3">
+                          <label className="form-label text-dark">Upload Image</label>
+                          <input type="file" className="form-control" accept="image/png, image/jpeg" onChange={handleImageChange} />
+                        </div>
+                      </div>
+
+                      <div className="form-group mb-3 d-flex flex-column text-start text-dark">
+                      
+                          <label>Authors</label>
+                          <>
+                            {
+                                authors.map((author, index) => (
+                                    <Fragment>
+                                        <div key={index} className="form-group d-flex align-items-center">
+                                            <input
+                                                type="text"
+                                                name={`answerContent_${index}`}
+                                                value={author}
+                                                onChange={e => handleInputChange(index, e)}
+                                                className="form-control"
+                                                style={{ marginRight: '10px' }}
+                                            />
+                                            <button type="button" onClick={() => handleRemoveAuthor(index)} className="btn btn-danger btn-small" style={{ padding: '8px 8px'  }}>x</button>
+                                        </div>
+                                        <div validation={`answerContent_${index}`} className="error-message" style={{ color: 'red' }} alias="This answer"></div>
+                                    </Fragment>
+                                ))
+                            }
+                            <button type="button" onClick={handleAddAuthor} className="btn btn-primary" style={{padding: "4px 8px"}}>Add author</button>
+                            <div className="error-type" style={{ color: 'red' }}></div>
+                        </>
                       </div>
                     </div>
                     <form className="w-100">
@@ -77,19 +196,40 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                         <input type="text" className="form-control" name="publisher" value={product.publisher} onChange={handleChange} />
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
-                        <label>Author</label>
-                        <input type="text" className="form-control" name="author" value={product.author} onChange={handleChange} />
+                        <label>Category ID</label>
+                        {category.map((c) => (
+                            <div key={c._id} className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id={`category-${c._id}`}
+                                value={c._id}
+                                checked={product.categoryId.includes(c._id)}
+                                onChange={handleCategoryChange}
+                              />
+                              <label className="form-check-label" htmlFor={`category-${c._id}`}>
+                                {c.name}
+                              </label>
+                            </div>
+                          ))}
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
-                        <label>Category ID</label>
-                        <input type="text" className="form-control" name="categoryId" value={product.categoryId} onChange={handleChange} />
+                        <label>Release date</label>
+                        <input type="date" className="form-control" name="releaseDate" value={product.releaseDate} onChange={handleChange} />
                       </div>
+
                     </form>
                   </div>
+                  <div style = {{ marginRight: "10px",  marginLeft: "10px"}}>
+                      <div className="form-group mb-3 d-flex flex-column text-start text-dark">
+                        <label>Description</label>
+                        <textarea className="form-control" name="description" value={product.description} onChange={handleChange}></textarea>
+                      </div>
+                    </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal} style={{ backgroundColor: "gray" }}>Close</button>
-                  <button type="button" className="btn btn-success" onClick={handleSubmit} style={{ backgroundColor: "green" }}>Save</button>
+                  <button type="button" className="btn btn-secondary btn-small" onClick={handleCloseModal} style={{ backgroundColor: "gray" }}>Close</button>
+                  <button type="button" className="btn btn-success btn-small" onClick={handleSubmit} style={{ backgroundColor: "green" }}>Save</button>
                 </div>
               </div>
             </div>

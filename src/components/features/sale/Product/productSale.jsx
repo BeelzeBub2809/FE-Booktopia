@@ -2,23 +2,25 @@ import React, { useState, useEffect } from 'react';
 import './productSale.css';
 import { DataTable } from 'simple-datatables';
 import AddProductModal from '../Modal/addProductModal';
+import EditProductModal from '../Modal/editProductModal';
+import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
+import Lottie from "react-lottie"; 
 
 function ProductSale() {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const products = [
-    { name: 'Unity Pugh', ext: '9958', city: 'Curico', startDate: '2005/02/11', completion: '37%' },
-    { name: 'Theodore Duran', ext: '8971', city: 'Dhanbad', startDate: '1999/04/07', completion: '97%' },
-    { name: 'Kylie Bishop', ext: '3147', city: 'Norman', startDate: '2005/09/08', completion: '63%' },
-    { name: 'Willow Gilliam', ext: '3497', city: 'Amqui', startDate: '2009/29/11', completion: '30%' },
-    { name: 'Blossom Dickerson', ext: '5018', city: 'Kempten', startDate: '2006/11/09', completion: '17%' },
-    { name: 'Karyn Byers', ext: '7741', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-    { name: 'Buffy Russell', ext: '3362', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-    { name: 'Buffy Russell', ext: '3362', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-    { name: 'Buffy Russell', ext: '3362', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-    { name: 'Buffy Russell', ext: '3362', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-    { name: 'Buffy Russell', ext: '3362', city: 'Bathurst', startDate: '2006/04/25', completion: '26%' },
-  ];
+  const loadingObj = {
+    loop: true,
+    autoplay: true,
+    animationData: LoadingLottie,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
 
   useEffect(() => {
     const datatables = document.querySelectorAll('.datatable');
@@ -47,6 +49,28 @@ function ProductSale() {
     }
   }, []);
 
+  useEffect(() => {
+    fetch("http://localhost:9999/api/product/all", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setData(data.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching products:", error);
+        setLoading(false);
+      });
+  }, []);
+
+
   const openAddProductModal = () => {
     setIsAddProductModalOpen(true);
   };
@@ -55,10 +79,14 @@ function ProductSale() {
     setIsAddProductModalOpen(false);
   };
 
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+  }
+
   return (
     <main id="main" className="main">
       <div className="pagetitle">
-        <h2>Data Tables</h2>
+        <h2>Manage Product</h2>
       </div>
 
       <section className="section">
@@ -67,40 +95,45 @@ function ProductSale() {
             <div className="card">
               <div className="card-body">
                 <button className="btn btn-primary mb-3" onClick={openAddProductModal}>Add Product</button>
-                
+                { loading ? (
+                  <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
+                ) : (
                 <table className="table datatable">
                   <thead>
                     <tr>
+                      <th>ISBN</th>
                       <th>Name</th>
-                      <th>Ext.</th>
-                      <th>City</th>
-                      <th>Start Date</th>
-                      <th>Completion</th>
-                      <th>Actions</th>
+                      <th>Quantity In Stock</th>
+                      <th>Publisher</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((product, index) => (
-                      <tr key={index}>
-                        <td>{product.name}</td>
-                        <td>{product.ext}</td>
-                        <td>{product.city}</td>
-                        <td>{product.startDate}</td>
-                        <td>{product.completion}</td>
-                        <td>
-                          <button className="btn btn-warning btn-sm me-2">Edit</button>
-                          <button className="btn btn-danger btn-sm">Inactive</button>
-                        </td>
-                      </tr>
-                    ))}
+                   {
+                    data.map((p, index) => (
+                        <tr key={index}>
+                          <td>{p.isbn}</td>
+                          <td>{p.name}</td>
+                          <td>{p.quantityInStock}</td>
+                          <td>{p.publisher}</td>
+                          <td>{p.status}</td>
+                          <td>
+                            <button className="btn btn-warning btn-sm me-2" onClick={()=>{ setSelectedItem(p); setShowEditModal(true)}}>Edit</button>
+                            <button className="btn btn-danger btn-sm">Inactive</button>
+                          </td>
+                        </tr>
+                      ))
+                    }
                   </tbody>
                 </table>
+                )}
               </div>
             </div>
           </div>
         </div>
       </section>
       <AddProductModal showModal={isAddProductModalOpen} handleCloseModal={closeAddProductModal}/>
+      {/* <EditProductModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/> */}
     </main>
   );
 }
