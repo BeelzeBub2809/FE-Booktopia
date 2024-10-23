@@ -69,13 +69,15 @@ function Home() {
         )}
 
       </div>
+          <div className='explore-btn'>
+          <Link to={"/shop"}>
+          <button 
+            className="solid-secondary-btn homepage-explore-all-btn" >
+            Explore All
+          </button>
+        </Link>
+          </div>
 
-      <Link to={"/shop"}>
-        <button 
-          className="solid-secondary-btn homepage-explore-all-btn" >
-          Explore All
-        </button>
-      </Link>
 
       <h1 className='homepage-headings'>New Arrivals</h1>
       <NewArrivals/>

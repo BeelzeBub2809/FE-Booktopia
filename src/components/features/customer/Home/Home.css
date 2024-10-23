@@ -43,7 +43,7 @@
     background-color: var(--red-color);
     background-position: center ;
     transition: background 0.5s;
-    margin-left: 700px;
+
 }
 
 .homepage-explore-all-btn:hover 
@@ -73,4 +73,9 @@
     padding: 4rem;
     justify-content: center;
     justify-items: center;
+}
+.explore-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

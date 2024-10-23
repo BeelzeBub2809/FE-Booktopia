@@ -72,7 +72,7 @@ function Header() {
           <button className="icon-btn">
             <div className="icon-count-badge">
               <i className="fa fa-heart-o" aria-hidden="true"></i>
-              <span className="count-badge-x">8</span>
+              
             </div>
           </button>
         </Link>
@@ -81,7 +81,7 @@ function Header() {
           <button className="icon-btn">
             <div className="icon-count-badge">
               <i className="fa fa-shopping-cart" aria-hidden="true"></i>
-              <span className="count-badge-x">8</span>
+             
             </div>
           </button>
         </Link>
@@ -90,7 +90,7 @@ function Header() {
           <button className="icon-btn">
             <div className="icon-count-badge">
               <BsFillBagFill style={{ marginBottom: "4px" }} />
-              <span className="count-badge-x">8</span>
+             
             </div>
           </button>
         </Link>

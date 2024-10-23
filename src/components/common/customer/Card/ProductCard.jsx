@@ -26,7 +26,7 @@ function ProductCard({ product }) {
             <i className="fa fa-heart-o" aria-hidden="true"></i>
           </button>
         </div>
-        // <div className="badge-on-card">d</div>
+
       </div>
     </div>
   );

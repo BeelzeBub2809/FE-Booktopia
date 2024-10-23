@@ -6,6 +6,8 @@ function Shop() {
     const [products, setProducts] = useState([]);
     const [genres, setGenres] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(250000);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,7 +27,6 @@ function Shop() {
                 const genresData = await genresResponse.json();
                 setProducts(productsData.data);
                 setGenres(genresData.data);
-
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -45,16 +46,28 @@ function Shop() {
         });
     };
 
-    // Filter products based on selected genres
-    const filteredProducts = selectedGenres.length > 0
-        ? products.filter(product => 
-            product.categoryId.some(id => selectedGenres.includes(id)) // Check if any categoryId matches selected genres
-        )
-        : products;
+    // Function to handle price range changes
+    const handlePriceChange = (minPrice, maxPrice) => {
+        setMinPrice(minPrice);
+        setMaxPrice(maxPrice);
+    };
+
+    // Filter products based on selected genres and price range
+    const filteredProducts = products.filter(product => {
+        const inSelectedGenres = selectedGenres.length === 0 || product.categoryId.some(id => selectedGenres.includes(id));
+        const inPriceRange = product.price >= minPrice && product.price <= maxPrice; // Check if product price is within range
+        return inSelectedGenres && inPriceRange; // Combine both filters
+    });
+
+    console.log(maxPrice);
 
     return (
         <div className='shop-container'>
-            <Sidebar genres={genres} onGenreChange={handleGenreChange} />
+            <Sidebar 
+                genres={genres} 
+                onGenreChange={handleGenreChange} 
+                onPriceChange={handlePriceChange} // Pass onPriceChange here
+            />
             <div className='products-container'>
                 <h2 className='total-product'>Showing {filteredProducts.length} products</h2>
                 <div className="products-card-grid">
