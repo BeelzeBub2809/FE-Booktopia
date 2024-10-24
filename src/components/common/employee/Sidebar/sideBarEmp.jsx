@@ -20,7 +20,7 @@ function SideBarEmp() {
         </li>
         
         <li class="nav-item">
-          <a class="nav-link collapsed" href="/sage/category">
+          <a class="nav-link collapsed" href="/sale/category">
             <i class="bi bi-bookmarks"></i>
             <span>Category</span>
           </a>
