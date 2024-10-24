@@ -5,6 +5,8 @@ import AddProductModal from '../Modal/addProductModal';
 import EditProductModal from '../Modal/editProductModal';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
 import Lottie from "react-lottie"; 
+import ProductService from '../../../../services/product/productService';
+import Swal from 'sweetalert2';
 
 function ProductSale() {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -82,6 +84,29 @@ function ProductSale() {
     setShowEditModal(false);
   }
 
+  const handleChangeActive = async (id, status) => {
+    try {
+      const res = await ProductService.updateProduct({_id:id, status: status === 'active' ? 'inactive' : 'active'});
+      Swal.fire({
+        title: `successfully`,
+        text: res.message,
+        icon: 'success',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        confirmButtonText: 'Ok',
+      }).then(() => {
+        window.location.reload();
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+    }
+  }
+
   return (
     <main id="main" className="main">
       <div className="pagetitle">
@@ -118,7 +143,13 @@ function ProductSale() {
                           <td>{p.status}</td>
                           <td>
                             <button className="btn btn-warning btn-sm me-2" onClick={()=>{ setSelectedItem(p); setShowEditModal(true)}}>Edit</button>
-                            <button className="btn btn-danger btn-sm">Inactive</button>
+                            {
+                              p.status === 'active' ? (
+                                <button className="btn btn-success btn-sm" onClick={() => handleChangeActive(p._id,p.status)}>Active</button>
+                              ) : (
+                                <button className="btn btn-danger btn-sm" onClick={() => handleChangeActive(p._id,p.status)}>Inactive</button>
+                              )
+                            }
                           </td>
                         </tr>
                       ))
@@ -132,7 +163,7 @@ function ProductSale() {
         </div>
       </section>
       <AddProductModal showModal={isAddProductModalOpen} handleCloseModal={closeAddProductModal}/>
-      {/* <EditProductModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/> */}
+      <EditProductModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/>
     </main>
   );
 }
