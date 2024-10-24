@@ -1,8 +1,8 @@
 import { useState, useEffect, Fragment } from 'react';
-import LoadingLottie from "../../../../Assets/Lottie/loading-0.json"; 
+import LoadingLottie from "../../../../../Assets/Lottie/loading-0.json"; 
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
-import ProductService from '../../../../services/product/productService';
+import ProductService from '../../../../../services/product/productService';
 
 export default function EditProductModal({ showModal, handleCloseModal, item }) {
   const [loading, setLoading] = useState(true); 

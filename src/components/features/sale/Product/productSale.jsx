@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './productSale.css';
 import { DataTable } from 'simple-datatables';
-import AddProductModal from '../Modal/addProductModal';
-import EditProductModal from '../Modal/editProductModal';
+import AddProductModal from './Modal/addProductModal';
+import EditProductModal from './Modal/editProductModal';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
 import Lottie from "react-lottie"; 
 import ProductService from '../../../../services/product/productService';
@@ -12,7 +12,7 @@ function ProductSale() {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const loadingObj = {
@@ -25,33 +25,7 @@ function ProductSale() {
   };
 
   useEffect(() => {
-    const datatables = document.querySelectorAll('.datatable');
-    if (datatables.length > 0) {
-      datatables.forEach(datatable => {
-        const dataTable = new DataTable(datatable, {
-          perPageSelect: [10, 15, ["All", -1]],
-          perPage: 10,
-          columns: [
-            {
-              select: 0,
-              sortSequence: ["desc", "asc"]
-            },
-            {
-              select: 1,
-              sortSequence: ["desc"]
-            },
-            {
-              select: 4,
-              cellClass: "green",
-              headerClass: "red"
-            }
-          ]
-        });
-      });
-    }
-  }, []);
-
-  useEffect(() => {
+    setLoading(true);
     fetch("http://localhost:9999/api/product", {
       method: 'GET',
       headers: {
@@ -59,18 +33,55 @@ function ProductSale() {
       },
       credentials: 'include'
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setData(data.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching products:", error);
-        setLoading(false);
-      });
+    .then(response => response.json())
+    .then(data => {
+      setData(data.data);
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error("Error fetching products:", error);
+      setLoading(false);
+    });
   }, []);
+  
+  useEffect(() => {
+    if (data.length > 0 && !loading) {
+      const datatables = document.querySelectorAll('.datatable');
+      if (datatables.length > 0) {
+        datatables.forEach(datatable => {
+          if (datatable.DataTable) {
+            datatable.DataTable().destroy();
+          }
+  
+          new DataTable(datatable, {
+            perPageSelect: [10, 15, ["All", -1]],
+            searchable: true,
+            paging: true,
+            perPage: 10,
+            columns: [
+              { select: 0, sortSequence: ["desc", "asc"] },
+              { select: 1, sortSequence: ["desc"] },
+              { select: 4, cellClass: "green", headerClass: "red" }
+            ]
+          });
+          datatable.addEventListener('click', (event) => {
+            const target = event.target;
+            const row = target.closest('tr');
+            const rowIndex = row ? row.getAttribute('data-index') : null;
+            const selectedProduct = data[rowIndex];
 
+            if (target.classList.contains('btn-warning')) {
+              setSelectedItem(selectedProduct);
+              setShowEditModal(true);
+            } else if (target.classList.contains('btn-success') || target.classList.contains('btn-danger')) {
+              handleChangeActive(selectedProduct._id, selectedProduct.status);
+            }
+          });
+        });
+      }
+    }
+  }, [data, loading]);
+  
 
   const openAddProductModal = () => {
     setIsAddProductModalOpen(true);
@@ -86,7 +97,10 @@ function ProductSale() {
 
   const handleChangeActive = async (id, status) => {
     try {
+      console.log(id, status);
       const res = await ProductService.updateProduct({_id:id, status: status === 'active' ? 'inactive' : 'active'});
+      console.log(res);
+      
       Swal.fire({
         title: `successfully`,
         text: res.message,
@@ -130,24 +144,25 @@ function ProductSale() {
                       <th>Quantity In Stock</th>
                       <th>Publisher</th>
                       <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                    {
                     data?.map((p, index) => (
-                        <tr key={index}>
+                        <tr key={p._id} data-index={index}> {/* Add data-index to track the row */}
                           <td>{p.isbn}</td>
                           <td>{p.name}</td>
                           <td>{p.quantityInStock}</td>
                           <td>{p.publisher}</td>
                           <td>{p.status}</td>
                           <td>
-                            <button className="btn btn-warning btn-sm me-2" onClick={()=>{ setSelectedItem(p); setShowEditModal(true)}}>Edit</button>
+                            <button className="btn btn-warning btn-sm me-2">Edit</button>
                             {
                               p.status === 'active' ? (
-                                <button className="btn btn-success btn-sm" onClick={() => handleChangeActive(p._id,p.status)}>Active</button>
+                                <button className="btn btn-success btn-sm">Active</button>
                               ) : (
-                                <button className="btn btn-danger btn-sm" onClick={() => handleChangeActive(p._id,p.status)}>Inactive</button>
+                                <button className="btn btn-danger btn-sm">Inactive</button>
                               )
                             }
                           </td>
