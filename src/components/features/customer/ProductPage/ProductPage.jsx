@@ -11,25 +11,32 @@ function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  // const [relatedBooks, setRelatedBooks] = useState([]);
   const [allBook, setAllBook] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0); // // State for reviews
 
-  // Combined fetch for product and related books
+  // Combined fetch for product, related books, and reviews
   useEffect(() => {
     const fetchProductData = async () => {
       try {
+        // Fetch product data
         const productResponse = await fetch(`http://localhost:9999/api/product/${id}`);
         if (!productResponse.ok) throw new Error("Failed to fetch product data.");
-
         const productData = await productResponse.json();
         setProduct(productData.data);
 
-        // Fetch all products to find related books
+        // Fetch all products for related books
         const allProductsResponse = await fetch("http://localhost:9999/api/product");
         if (!allProductsResponse.ok) throw new Error("Failed to fetch all products.");
-
         const allProductsData = await allProductsResponse.json();
-        setAllBook(allProductsData.data); // Set the correct data
+        setAllBook(allProductsData.data);
+
+        // Fetch reviews for the product
+        const reviewResponse = await fetch(`http://localhost:9999/api/review/book/${id}`);
+        if (!reviewResponse.ok) throw new Error("Failed to fetch product reviews.");
+        const reviewData = await reviewResponse.json();
+        setReviews(reviewData.data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -43,31 +50,6 @@ function ProductPage() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!product) return <div>No product found.</div>;
-
-  const {
-    name,
-    author,
-    image = [],
-    price,
-    reviews = [
-      {
-        reviewer: "John Doe",
-        comment: "Amazing book! A must-read for everyone.",
-        rating: 5,
-        date: "July 27, 2021",
-        location: "United States",
-        verifiedPurchase: true,
-      },
-      {
-        reviewer: "Jane Smith",
-        comment: "Inspirational and thought-provoking.",
-        rating: 4,
-        date: "June 29, 2021",
-        location: "United States",
-        verifiedPurchase: true,
-      },
-    ], // Default to sample reviews if undefined
-  } = product;
 
   const handleAddToCart = async (productId) => {
     try {
@@ -88,50 +70,87 @@ function ProductPage() {
     }
   };
 
-  const handleNextImage = () => setCurrentImageIndex((prev) => (prev + 1) % image.length);
-  const handlePreviousImage = () => setCurrentImageIndex((prev) => (prev === 0 ? image.length - 1 : prev - 1));
+  const handleNextImage = () => setCurrentImageIndex((prev) => (prev + 1) % product.image.length);
+  const handlePreviousImage = () => setCurrentImageIndex((prev) => (prev === 0 ? product.image.length - 1 : prev - 1));
 
   const relatedBooks = allBook.filter(b => 
     product.categoryId.some(catId => b.categoryId.includes(catId))
   );
-  
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://localhost:9999/api/review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerId: localStorage.getItem("userId"),
+          productId: id,
+          rating,
+          content: comment,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to submit review");
+      const newReview = await res.json();
+      setReviews([...reviews, newReview.data]);
+      setComment("");
+      setRating(0);
+
+      Swal.fire({
+        title: "Success",
+        text: "Review submitted successfully!",
+        icon: "success",
+        confirmButtonText: "Ok",
+      });
+    } catch (err) {
+      Swal.fire({
+        title: "Error",
+        text: err.message,
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+    }
+  };
+
   return (
     <div className="product-page-container container mt-5">
       <div className="product-page-item">
         {/* Image Section */}
         <div className="product-image-section">
           <div className="main-image-container">
-            <img className="main-image" src={image[currentImageIndex] || bookCover} alt={name} />
+            <img className="main-image" src={product.image[currentImageIndex] || bookCover} alt={product.name} />
           </div>
           <div className="image-controls">
-          <button className="btn btn-image" onClick={handlePreviousImage} disabled={image.length <= 1}>
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <div className="thumbnail-container">
-            {image.map((imgSrc, index) => (
-              <img
-                key={index}
-                className={`thumbnail-image ${index === currentImageIndex ? "active-thumbnail" : ""}`}
-                src={imgSrc}
-                alt={`${name} thumbnail ${index + 1}`}
-                onClick={() => setCurrentImageIndex(index)}
-              />
-            ))}
+            <button className="btn btn-image" onClick={handlePreviousImage} disabled={product.image.length <= 1}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <div className="thumbnail-container">
+              {product.image.map((imgSrc, index) => (
+                <img
+                  key={index}
+                  className={`thumbnail-image ${index === currentImageIndex ? "active-thumbnail" : ""}`}
+                  src={imgSrc}
+                  alt={`${product.name} thumbnail ${index + 1}`}
+                  onClick={() => setCurrentImageIndex(index)}
+                />
+              ))}
+            </div>
+            <button className="btn btn-image" onClick={handleNextImage} disabled={product.image.length <= 1}>
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
-          <button className="btn btn-image" onClick={handleNextImage} disabled={image.length <= 1}>
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
-        
-          
         </div>
 
         {/* Product Details Section */}
         <div className="product-details-section">
-          <h2 className="product-name">{name}</h2>
+          <h2 className="product-name">{product.name}</h2>
           <hr />
           <p className="product-author">
-            <b>Author: </b> {author}
+            <b>Author: </b> {product.author}
           </p>
           <p className="product-description">
             <b>Description: </b> This is a description test
@@ -141,7 +160,7 @@ function ProductPage() {
           </p>
           <h3 className="product-price">
             VND.100 &nbsp;&nbsp;
-            <del>VND {price}</del> &nbsp;&nbsp;
+            <del>VND {product.price}</del> &nbsp;&nbsp;
             <span className="discount">(20% off)</span>
           </h3>
           <div className="product-action-buttons">
@@ -158,21 +177,44 @@ function ProductPage() {
         <h3>Product Reviews</h3>
         <div className="review-list p-3">
           {reviews.length > 0 ? reviews.map((review, index) => (
-            <div key={index} className="review-item">
+            <div key={review._id} className="review-item">
               <div className="review-header">
-                <strong>{review.reviewer}</strong>
+               {/* <strong>{review.customerId.userId.userName}</strong> */}
                 <span className="rating">{"⭐".repeat(review.rating)}</span>
               </div>
-              <p>{review.comment}</p>
+              <p>{review.content}</p>
             </div>
           )) : <p>No reviews available</p>}
         </div>
 
         <h4>Write a Review</h4>
-        <form className="mt-3 p-3">
+        <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
           <div className="mb-3">
             <label htmlFor="comment" className="form-label">Your Comment</label>
-            <textarea className="form-control" id="comment" rows="3" placeholder="Write your comment here"></textarea>
+            <textarea
+              className="form-control"
+              id="comment"
+              rows="3"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Write your comment here"
+              required
+            ></textarea>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="rating" className="form-label">Rating</label>
+            <select
+              id="rating"
+              className="form-control"
+              value={rating}
+              onChange={(e) => setRating(Number(e.target.value))}
+              required
+            >
+              <option value="">Select rating</option>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <option key={star} value={star}>{star} Star{star > 1 ? "s" : ""}</option>
+              ))}
+            </select>
           </div>
           <button type="submit" className="btn btn-primary">Submit Review</button>
         </form>
