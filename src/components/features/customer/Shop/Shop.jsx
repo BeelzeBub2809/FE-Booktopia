@@ -8,6 +8,7 @@ function Shop() {
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(250000);
+    const [sortOrder, setSortOrder] = useState("price-low-to-high"); // New state for sorting
 
     useEffect(() => {
         const fetchData = async () => {
@@ -16,13 +17,8 @@ function Shop() {
                     fetch("http://localhost:9999/api/product"),
                     fetch("http://localhost:9999/api/category")
                 ]);
-
-                if (!productsResponse.ok) {
-                    throw new Error("Failed to fetch products.");
-                }
-                if (!genresResponse.ok) {
-                    throw new Error("Failed to fetch genres.");
-                }
+                if (!productsResponse.ok) throw new Error("Failed to fetch products.");
+                if (!genresResponse.ok) throw new Error("Failed to fetch genres.");
                 const productsData = await productsResponse.json();
                 const genresData = await genresResponse.json();
                 setProducts(productsData.data);
@@ -31,42 +27,46 @@ function Shop() {
                 console.error("Error fetching data:", error);
             }
         };
-
         fetchData();
     }, []);
 
-    // Function to handle genre selection
     const handleGenreChange = (genreId) => {
-        setSelectedGenres((prevSelected) => {
-            if (prevSelected.includes(genreId)) {
-                return prevSelected.filter((g) => g !== genreId); // Uncheck
-            } else {
-                return [...prevSelected, genreId]; // Check
-            }
-        });
+        setSelectedGenres((prevSelected) => 
+            prevSelected.includes(genreId) 
+            ? prevSelected.filter((g) => g !== genreId) 
+            : [...prevSelected, genreId]
+        );
     };
 
-    // Function to handle price range changes
     const handlePriceChange = (minPrice, maxPrice) => {
         setMinPrice(minPrice);
         setMaxPrice(maxPrice);
     };
 
-    // Filter products based on selected genres and price range
-    const filteredProducts = products.filter(product => {
-        const inSelectedGenres = selectedGenres.length === 0 || product.categoryId.some(id => selectedGenres.includes(id));
-        const inPriceRange = product.price >= minPrice && product.price <= maxPrice; // Check if product price is within range
-        return inSelectedGenres && inPriceRange; // Combine both filters
-    });
+    const handleSortChange = (order) => {
+        setSortOrder(order);
+    };
 
-    console.log(maxPrice);
+    const filteredProducts = products
+        .filter(product => {
+            const inSelectedGenres = selectedGenres.length === 0 || product.categoryId.some(id => selectedGenres.includes(id));
+            const inPriceRange = product.price >= minPrice && product.price <= maxPrice;
+            return inSelectedGenres && inPriceRange;
+        })
+        .sort((a, b) => {
+            if (sortOrder === "price-low-to-high") return a.price - b.price;
+            if (sortOrder === "price-high-to-low") return b.price - a.price;
+            if (sortOrder === "top-sellers") return b.sold - a.sold; // Sort by sold descending
+            return 0; // Default, no sorting
+        });
 
     return (
         <div className='shop-container'>
             <Sidebar 
                 genres={genres} 
                 onGenreChange={handleGenreChange} 
-                onPriceChange={handlePriceChange} // Pass onPriceChange here
+                onPriceChange={handlePriceChange} 
+                onSortChange={handleSortChange} // Pass onSortChange here
             />
             <div className='products-container'>
                 <h2 className='total-product'>Showing {filteredProducts.length} products</h2>

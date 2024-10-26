@@ -4,6 +4,7 @@ import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.j
 import "./ProductPage.css";
 import CartService from "../../../../services/cart/cartService";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 function ProductPage() {
   const { id } = useParams();
@@ -21,20 +22,29 @@ function ProductPage() {
     const fetchProductData = async () => {
       try {
         // Fetch product data
-        const productResponse = await fetch(`http://localhost:9999/api/product/${id}`);
-        if (!productResponse.ok) throw new Error("Failed to fetch product data.");
+        const productResponse = await fetch(
+          `http://localhost:9999/api/product/${id}`
+        );
+        if (!productResponse.ok)
+          throw new Error("Failed to fetch product data.");
         const productData = await productResponse.json();
         setProduct(productData.data);
 
         // Fetch all products for related books
-        const allProductsResponse = await fetch("http://localhost:9999/api/product");
-        if (!allProductsResponse.ok) throw new Error("Failed to fetch all products.");
+        const allProductsResponse = await fetch(
+          "http://localhost:9999/api/product"
+        );
+        if (!allProductsResponse.ok)
+          throw new Error("Failed to fetch all products.");
         const allProductsData = await allProductsResponse.json();
         setAllBook(allProductsData.data);
 
         // Fetch reviews for the product
-        const reviewResponse = await fetch(`http://localhost:9999/api/review/book/${id}`);
-        if (!reviewResponse.ok) throw new Error("Failed to fetch product reviews.");
+        const reviewResponse = await fetch(
+          `http://localhost:9999/api/review/book/${id}`
+        );
+        if (!reviewResponse.ok)
+          throw new Error("Failed to fetch product reviews.");
         const reviewData = await reviewResponse.json();
         setReviews(reviewData.data);
       } catch (err) {
@@ -70,11 +80,15 @@ function ProductPage() {
     }
   };
 
-  const handleNextImage = () => setCurrentImageIndex((prev) => (prev + 1) % product.image.length);
-  const handlePreviousImage = () => setCurrentImageIndex((prev) => (prev === 0 ? product.image.length - 1 : prev - 1));
+  const handleNextImage = () =>
+    setCurrentImageIndex((prev) => (prev + 1) % product.image.length);
+  const handlePreviousImage = () =>
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? product.image.length - 1 : prev - 1
+    );
 
-  const relatedBooks = allBook.filter(b => 
-    product.categoryId.some(catId => b.categoryId.includes(catId))
+  const relatedBooks = allBook.filter((b) =>
+    product.categoryId.some((catId) => b.categoryId.includes(catId))
   );
 
   const handleReviewSubmit = async (e) => {
@@ -122,24 +136,38 @@ function ProductPage() {
         {/* Image Section */}
         <div className="product-image-section">
           <div className="main-image-container">
-            <img className="main-image" src={product.image[currentImageIndex] || bookCover} alt={product.name} />
+            <img
+              className="main-image"
+              src={product.image[currentImageIndex] || bookCover}
+              alt={product.name}
+            />
           </div>
           <div className="image-controls">
-            <button className="btn btn-image" onClick={handlePreviousImage} disabled={product.image.length <= 1}>
+            <button
+              className="btn btn-image"
+              onClick={handlePreviousImage}
+              disabled={product.image.length <= 1}
+            >
               <i className="fas fa-chevron-left"></i>
             </button>
             <div className="thumbnail-container">
               {product.image.map((imgSrc, index) => (
                 <img
                   key={index}
-                  className={`thumbnail-image ${index === currentImageIndex ? "active-thumbnail" : ""}`}
+                  className={`thumbnail-image ${
+                    index === currentImageIndex ? "active-thumbnail" : ""
+                  }`}
                   src={imgSrc}
                   alt={`${product.name} thumbnail ${index + 1}`}
                   onClick={() => setCurrentImageIndex(index)}
                 />
               ))}
             </div>
-            <button className="btn btn-image" onClick={handleNextImage} disabled={product.image.length <= 1}>
+            <button
+              className="btn btn-image"
+              onClick={handleNextImage}
+              disabled={product.image.length <= 1}
+            >
               <i className="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -159,13 +187,16 @@ function ProductPage() {
             <b>Rating: </b> 5
           </p>
           <h3 className="product-price">
-            VND.100 &nbsp;&nbsp;
-            <del>VND {product.price}</del> &nbsp;&nbsp;
-            <span className="discount">(20% off)</span>
+            <b className="product-price-new">{product.price}VND</b>
+            <del className="product-price-old">{product.price}</del> VND
+            <span className="product-discount">(20% off)</span>
           </h3>
           <div className="product-action-buttons">
             <button className="btn btn-primary">Add to wishlist</button>
-            <button className="btn btn-warning" onClick={() => handleAddToCart(product._id)}>
+            <button
+              className="btn btn-warning"
+              onClick={() => handleAddToCart(product._id)}
+            >
               Add to cart
             </button>
           </div>
@@ -176,21 +207,27 @@ function ProductPage() {
       <div className="container mt-5">
         <h3>Product Reviews</h3>
         <div className="review-list p-3">
-          {reviews.length > 0 ? reviews.map((review, index) => (
-            <div key={review._id} className="review-item">
-              <div className="review-header">
-               {/* <strong>{review.customerId.userId.userName}</strong> */}
-                <span className="rating">{"⭐".repeat(review.rating)}</span>
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <div key={review._id} className="review-item">
+                <div className="review-header">
+                  <strong>{review.customerId.userId.userName}</strong>
+                  <span className="rating">{"⭐".repeat(review.rating)}</span>
+                </div>
+                <p>{review.content}</p>
               </div>
-              <p>{review.content}</p>
-            </div>
-          )) : <p>No reviews available</p>}
+            ))
+          ) : (
+            <p>No reviews available</p>
+          )}
         </div>
 
         <h4>Write a Review</h4>
         <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
           <div className="mb-3">
-            <label htmlFor="comment" className="form-label">Your Comment</label>
+            <label htmlFor="comment" className="form-label">
+              Your Comment
+            </label>
             <textarea
               className="form-control"
               id="comment"
@@ -202,7 +239,9 @@ function ProductPage() {
             ></textarea>
           </div>
           <div className="mb-3">
-            <label htmlFor="rating" className="form-label">Rating</label>
+            <label htmlFor="rating" className="form-label">
+              Rating
+            </label>
             <select
               id="rating"
               className="form-control"
@@ -212,11 +251,15 @@ function ProductPage() {
             >
               <option value="">Select rating</option>
               {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>{star} Star{star > 1 ? "s" : ""}</option>
+                <option key={star} value={star}>
+                  {star} Star{star > 1 ? "s" : ""}
+                </option>
               ))}
             </select>
           </div>
-          <button type="submit" className="btn btn-primary">Submit Review</button>
+          <button type="submit" className="btn btn-primary">
+            Submit Review
+          </button>
         </form>
       </div>
 
@@ -224,13 +267,23 @@ function ProductPage() {
       <div className="related-books-section">
         <h3>Related Books</h3>
         <div className="related-books-list">
-          {relatedBooks.length > 0 ? relatedBooks.map((book, index) => (
-            <div key={index} className="related-book-card">
-              <img className="related-book-image" src={book.image || bookCover} alt={book.name} />
-              <h4>{book.name}</h4>
-              <p>by {book.author}</p>
-            </div>
-          )) : <p>No related books found</p>}
+          {relatedBooks.length > 0 ? (
+            relatedBooks.map((book, index) => (
+              <div key={index} className="related-book-card">
+                <Link to={`/shop/${book._id}`}>
+                  <img
+                    className="related-book-image"
+                    src={book.image || bookCover}
+                    alt={book.name}
+                  />
+                </Link>
+                <h4>{book.name}</h4>
+                <p>by {book.author}</p>
+              </div>
+            ))
+          ) : (
+            <p>No related books found</p>
+          )}
         </div>
       </div>
     </div>
