@@ -18,3 +18,16 @@
 {
     background-color: var(--grey);
 }
+.discount-on-card{
+    margin-left: 20px;
+}
+.card-item-price{
+    font-size: 1.5rem;
+}
+.card-item-price-old{
+    text-decoration: line-through;
+}
+
+.card-item-title{
+    margin-top: 2rem;
+}

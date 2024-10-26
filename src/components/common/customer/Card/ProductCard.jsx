@@ -12,21 +12,20 @@ function ProductCard({ product }) {
       </Link>
 
       <div className="card-item-details">
-        <div className="item-title">
+        <div className="card-item-title">
           <h4>{product.name}</h4>
         </div>
-        <h5 className="item-seller">- Sold by &nbsp;Tuan</h5>
-        <p>
-          <b>{product.price} &nbsp;&nbsp;</b>
-          <del>10000</del> &nbsp;&nbsp;
+        <div className="card-item-price">
+          <b className="card-item-price-new">{product.price} VND</b>
+          <br/>
+          <del className="card-item-price-old">{product.price}</del>   VND
           <span className="discount-on-card">(20 % off)</span>
-        </p>
+        </div>
         <div className="card-button">
           <button className="card-icon-btn add-to-wishlist-btn outline-card-secondary-btn">
             <i className="fa fa-heart-o" aria-hidden="true"></i>
           </button>
         </div>
-
       </div>
     </div>
   );
