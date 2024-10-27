@@ -71,7 +71,32 @@ const removeFromCart = async (productId) => {
   }
 }
 
+const changeQuantity = async ({productId, quantity}) => {
+  try {
+      const addInfo = {
+          productId: productId,
+          quantity: quantity,
+      };
+      let response = await fetch(`http://localhost:9999/api/cart/${userId}/update`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(addInfo),
+          credentials: 'include',
+      });
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Network response was not ok');
+      }
+      const res = await response.json();
+      return res;
+  } catch (error) {
+      throw error;
+  }
+}
+
 const CartService = {
-  getCart, addToCart, removeFromCart
+  getCart, addToCart, removeFromCart, changeQuantity
 };
 export default CartService;

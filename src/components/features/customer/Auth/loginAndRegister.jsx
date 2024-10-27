@@ -13,6 +13,17 @@ function LoginAndRegister() {
   const navigation = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Register form state
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    repeatPassword: '',
+    phone: ''
+  });
+  const [errors, setErrors] = useState({});
+
   let formControl = new ValidatorsControl({
     username: { value: username, validators: Rules.noValidate }, // Use username instead of email
     password: { value: password, validators: Rules.password },
@@ -71,6 +82,110 @@ function LoginAndRegister() {
       }
     }
   };
+
+  // Validate register form
+  const validate = () => {
+    const newErrors = {};
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{8,}$/; // No whitespace allowed
+    const emailRegex = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/;
+    const phoneRegex = /^0\d{9}$/; // 10 digits, starts with 0
+
+    // Trim all input fields
+    const trimmedData = {
+      username: formData.username.trim(),
+      email: formData.email.trim(),
+      password: formData.password.trim(),
+      repeatPassword: formData.repeatPassword.trim(),
+      phone: formData.phone.trim()
+    };
+
+    // Username validation
+    if (!trimmedData.username) {
+      newErrors.username = "Username is required";
+    }
+
+    // Email validation
+    if (!trimmedData.email) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(trimmedData.email)) {
+      newErrors.email = "Invalid email format. Please use only letters, numbers, dots (.), hyphens (-), and underscores (_) before the '@' symbol, followed by a domain name (e.g., example@domain.com). The domain must end with at least two letters (e.g., .com, .net).";
+    }
+
+    // Password validation
+    if (!trimmedData.password) {
+      newErrors.password = "Password is required";
+    } else if (!passwordRegex.test(trimmedData.password)) {
+      newErrors.password = "Password must contain at least 8 characters, including letters and numbers, and no whitespace";
+    }
+
+    // Repeat password validation
+    if (!trimmedData.repeatPassword) {
+      newErrors.repeatPassword = "Please confirm your password";
+    } else if (trimmedData.repeatPassword !== trimmedData.password) {
+      newErrors.repeatPassword = "Passwords do not match";
+    }
+
+    // Phone validation for Vietnamese format
+    if (!trimmedData.phone) {
+      newErrors.phone = "Phone number is required";
+    } else if (!phoneRegex.test(trimmedData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits and start with 0";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleSubmitRegisterForm = async (e) => {
+    e.preventDefault();
+
+    // Trim all input values
+    const trimmedData = {
+      username: formData.username.trim(),
+      email: formData.email.trim(),
+      password: formData.password.trim(),
+      phone: formData.phone.trim()
+    };
+
+    // Update the formData with trimmed values
+    setFormData((prevData) => ({
+      ...prevData,
+      ...trimmedData
+    }));
+
+    if (validate()) {
+      let isSubmit = formControl.submitForm(e);
+      if (isSubmit) {
+        try {
+          const response = await AuthService.register(trimmedData.username, trimmedData.email, trimmedData.password, trimmedData.phone);
+          console.log(response);
+          Swal.fire({
+            title: 'Success',
+            text: response.message,
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          });
+        } catch (error) {
+          Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok',
+          });
+        }
+      }
+    }
+  };
+
+
   return (
     <div className='container min-vh-100 position-relative'>
       <div className="container border border-primary shadow p-3 mb-5 bg-body rounded position-absolute top-50 start-50 translate-middle" style={{ width: '40%' }}>
@@ -111,12 +226,12 @@ function LoginAndRegister() {
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
                   <label className="form-label">User Name</label>
-                  <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)}/>
+                  <input type="text" className="form-control" onChange={(e) => setUsername(e.target.value)} />
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
                   <label className="form-label" htmlFor="loginPassword">Password</label>
-                  <input type="password" id="loginPassword" className="form-control" onChange={(e) => setPassword(e.target.value)}/>
+                  <input type="password" id="loginPassword" className="form-control" onChange={(e) => setPassword(e.target.value)} />
                 </div>
 
                 <div className="row mb-4">
@@ -151,50 +266,38 @@ function LoginAndRegister() {
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerName">Name<span className="text-danger">*</span></label>
-                  <input type="text" id="registerName" className="form-control" />
+                  <label className="form-label" htmlFor="username">Username<span className="text-danger">*</span></label>
+                  <input type="text" id="username" className="form-control" value={formData.username} onChange={handleInputChange} />
+                  {errors.username && <small className="text-danger">{errors.username}</small>}
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerUsername">Username<span className="text-danger">*</span></label>
-                  <input type="text" id="registerUsername" className="form-control" />
+                  <label className="form-label" htmlFor="email">Email<span className="text-danger">*</span></label>
+                  <input type="email" id="email" className="form-control" value={formData.email} onChange={handleInputChange} />
+                  {errors.email && <small className="text-danger">{errors.email}</small>}
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerEmail">Email<span className="text-danger">*</span></label>
-                  <input type="email" id="registerEmail" className="form-control" />
+                  <label className="form-label" htmlFor="password">Password<span className="text-danger">*</span></label>
+                  <input type="password" id="password" className="form-control" value={formData.password} onChange={handleInputChange} />
+                  {errors.password && <small className="text-danger">{errors.password}</small>}
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerPassword">Password<span className="text-danger">*</span></label>
-                  <input type="password" id="registerPassword" className="form-control" />
-                </div>
-
-                <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label" htmlFor="registerRepeatPassword">Repeat password<span className="text-danger">*</span></label>
-                  <input type="password" id="registerRepeatPassword" className="form-control" />
+                  <label className="form-label" htmlFor="repeatPassword">Repeat password<span className="text-danger">*</span></label>
+                  <input type="password" id="repeatPassword" className="form-control" value={formData.repeatPassword} onChange={handleInputChange} />
+                  {errors.repeatPassword && <small className="text-danger">{errors.repeatPassword}</small>}
                 </div>
 
                 <div className="form-outline mb-4 d-flex flex-column text-start">
                   <label className="form-label">Phone<span className="text-danger">*</span></label>
-                  <input type="text" className="form-control" />
+                  <input type="text" id="phone" className="form-control" value={formData.phone} onChange={handleInputChange} />
+                  {errors.phone && <small className="text-danger">{errors.phone}</small>}
                 </div>
 
-                <div className="form-outline mb-4 d-flex flex-column text-start">
-                  <label className="form-label">Address</label>
-                  <input type="text" className="form-control" />
-                </div>
-
-                <div className="form-check d-flex justify-content-center mb-4">
-                  <input className="form-check-input me-2" type="checkbox" value="" id="registerCheck" checked
-                    aria-describedby="registerCheckHelpText" />
-                  <label className="form-check-label" htmlFor="registerCheck">
-                    I have read and agree to the terms
-                  </label>
-                </div>
 
                 <div className='d-flex justify-content-around'>
-                  <button type="submit" className="btn btn-primary btn-block mb-3">Sign up</button>
+                  <button type="submit" className="btn btn-primary btn-block mb-3" onClick={(e) => handleSubmitRegisterForm(e)}>Sign up</button>
                 </div>
               </form>
             </div>

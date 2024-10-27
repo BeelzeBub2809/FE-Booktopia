@@ -43,7 +43,7 @@
 .cart-item-total-price
 {
     padding: 1rem;
-    width: 20%;
+    width: 30%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -106,8 +106,15 @@
 .cart-item-total-discount-amount, .cart-item-total-delivery-charges-amount
 {
     padding: 1rem;
-    width: 20%;
+    width: 30%;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.address-container {
+    width: 100%;
+}
+.address-component {
+    margin-bottom: 20px;
 }

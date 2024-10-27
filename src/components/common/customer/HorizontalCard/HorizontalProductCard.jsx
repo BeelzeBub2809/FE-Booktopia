@@ -1,30 +1,19 @@
 import "./HorizontalProductCard.css";
 import React from "react";
-import imgSrc1 from "../../../../Assets/Images/Book_Covers/Attack_On_Titan.jpg";
 import Swal from "sweetalert2";
-import CartService from "../../../../services/cart/cartService";
 
+function HorizontalProductCard({ item, handleRemoveItem, handleChangeQuantity }) {
+  const [isCheckout, setIsCheckout] = React.useState(false);
 
-function HorizontalProductCard({ item, handleRemoveItem }) {
-  // Dữ liệu tĩnh cho thẻ sản phẩm
-  const bookName = "50 Shades of Grey";
-  const author = "E. L. James";
-  const imgSrc = "../../../../Assets/Images/Book_Covers/book1.jpg";
-  const imgAlt = "50 Shades of Grey Cover";
-  const discountedPrice = 360;
-  const originalPrice = 450;
-  const discountPercent = 20;
-  const quantity = 1;
-
-
-
-
+  const handleChooseToCheckout = () => {
+    setIsCheckout(!isCheckout);
+  }
   return (
     <>
       {
         item.amount > 0 && (
           <div className="card-basic-horizontal">
-            <img className="cart-item-book-img" src={item.productId.image} alt={imgAlt} />
+            <img className="cart-item-book-img" src={item.productId.image} alt={item.productId.name}/>
             <div id="cart-item-detail" className="card-item-details">
               <h4 id="item-title">{item.productId.name}</h4>
               <p className="item-author">- By &nbsp;{item.productId.author}</p>
@@ -37,7 +26,7 @@ function HorizontalProductCard({ item, handleRemoveItem }) {
               <div className="item-cart-quantity">
                 <p className="cart-quantity-para">Quantity : &nbsp;&nbsp;</p>
                 <div className="quantity-manage-container">
-                  <div className="quantity-change">-</div>
+                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount, "sub")}>-</div>
                   <input
                     className="cart-item-quantity-input"
                     type="text"
@@ -46,7 +35,7 @@ function HorizontalProductCard({ item, handleRemoveItem }) {
                     autoComplete="off"
                     readOnly
                   />
-                  <div className="quantity-change">+</div>
+                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount, "add")}>+</div>
                 </div>
               </div>
 
@@ -54,7 +43,7 @@ function HorizontalProductCard({ item, handleRemoveItem }) {
                 <button className="solid-primary-btn" onClick={() => handleRemoveItem(item.productId._id)}>
                   Remove from Cart
                 </button>
-                <button className="outline-primary-btn">
+                <button className={isCheckout ? "btn btn-success": "outline-primary-btn"} onClick={handleChooseToCheckout}>
                   Choose to checkout
                 </button>
               </div>

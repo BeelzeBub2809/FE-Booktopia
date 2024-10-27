@@ -1,34 +1,25 @@
 import "./ShoppingBill.css";
 import React from "react";
+import Select from 'react-select';
 
-function ShoppingBill({cartItems}) {
-  console.log(cartItems);
-  
-  // Dữ liệu tĩnh cho giỏ hàng
-  const userCart = [
-    {
-      _id: "1",
-      bookName: "50 Shades of Grey",
-      quantity: 2,
-      discountedPrice: 360,
-    },
-    {
-      _id: "2",
-      bookName: "The Great Gatsby",
-      quantity: 1,
-      discountedPrice: 300,
-    },
-  ];
+const options = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' },
+];
 
-  const totalDiscount = 50; // Giả sử có một khoản giảm giá cố định
-  const deliveryCharges = 50; // Phí vận chuyển cố định
-  const finalBill =
-    userCart.reduce((total, product) => {
-      return total + product.discountedPrice * product.quantity;
-    }, 0) - totalDiscount + deliveryCharges;
+function ShoppingBill({ cartItems }) {
+  const [selectedOption, setSelectedOption] = React.useState(null);
+  const deliveryCharges = 50000;
+  const finalBillBeforeDiscount =
+    cartItems.reduce((total, cartItem) => {
+      return total + cartItem.productId.price * cartItem.amount;
+    }, 0)
 
-  const couponName = ""; // Giả sử không có coupon nào được áp dụng
-
+  let finalBill = 0;
+  const totalDiscount = finalBillBeforeDiscount > 500000 ? 0.2 : 0;
+  const discount = Math.min(finalBillBeforeDiscount * totalDiscount, 100000);
+  finalBill = finalBillBeforeDiscount - discount + deliveryCharges;
   return (
     <div className="cart-bill">
       <h2 className="bill-heading">Bill Details</h2>
@@ -50,6 +41,60 @@ function ShoppingBill({cartItems}) {
         );
       })}
 
+      <div className="address-container">
+        <div className="address-component">
+          <p>Choose province</p>
+          <Select
+            defaultValue={selectedOption}
+            onChange={setSelectedOption}
+            options={options}
+          />
+        </div>
+
+        <div className="address-component">
+          <p>Choose district</p>
+          <Select
+            defaultValue={selectedOption}
+            onChange={setSelectedOption}
+            options={options}
+          />
+        </div>
+
+        <div className="address-component">
+          <p>Choose ward</p>
+          <Select
+            defaultValue={selectedOption}
+            onChange={setSelectedOption}
+            options={options}
+          />
+        </div>
+        <div className="address-component">
+          <p>Detail address</p>
+          <input className="form-control" type="text" style={{ minHeight: "38px" }} />
+        </div>
+        <div className="address-component">
+          <p>Phone</p>
+          <input className="form-control" type="text" style={{ minHeight: "38px" }} />
+        </div>
+        <div className="address-component">
+          <p>Full name</p>
+          <input className="form-control" type="text" style={{ minHeight: "38px" }} />
+        </div>
+        <div class="form-check" style={{fontSize: "large"}}>
+          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"/>
+            <label class="form-check-label" for="flexRadioDefault1">
+              COD
+            </label>
+        </div>
+        <div class="form-check" style={{fontSize: "large"}}>
+          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked/>
+            <label class="form-check-label" for="flexRadioDefault2">
+              Internet Banking
+            </label>
+        </div>
+      </div>
+
+
       <hr />
 
       <div className="cart-discount-container">
@@ -57,7 +102,7 @@ function ShoppingBill({cartItems}) {
           <p>Discount</p>
         </div>
         <div className="cart-item-total-discount-amount" id="price-sum">
-          <p>&#8377; {totalDiscount}</p>
+          <p>{totalDiscount * 100}%</p>
         </div>
       </div>
 
@@ -66,10 +111,9 @@ function ShoppingBill({cartItems}) {
           <p>Delivery Charges</p>
         </div>
         <div className="cart-item-total-delivery-charges-amount" id="price-sum">
-          <p id="delivery-charges">&#8377; {deliveryCharges}</p>
+          <p id="delivery-charges">{deliveryCharges} VND</p>
         </div>
       </div>
-
       <hr />
 
       <div className="cart-total-charges-container">
@@ -80,7 +124,7 @@ function ShoppingBill({cartItems}) {
         </div>
         <div className="cart-item-total-delivery-charges-amount" id="price-sum">
           <p id="total-charges">
-            <b>&#8377; {finalBill}</b>
+            <b>{finalBill} VND</b>
           </p>
         </div>
       </div>
@@ -88,12 +132,7 @@ function ShoppingBill({cartItems}) {
       <hr />
 
       <div className="apply-coupon-container">
-        <p>Apply Coupon</p>
-        <input
-          value={couponName}
-          placeholder="Try BOOKS200"
-          readOnly
-        ></input>
+        <p>Orders over 500K get a 20% discount, up to 100K.</p>
       </div>
 
       <button className="place-order-btn solid-secondary-btn">
