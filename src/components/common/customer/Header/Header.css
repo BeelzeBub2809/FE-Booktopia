@@ -77,3 +77,126 @@
     background-size: 100%;
     transition: background 0s;
 }
+
+.search-bar1 {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 20px;
+  }
+  
+  .search-bar-input {
+    width: 100%;
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .search-bar-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  /* Search results container */
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-top: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  
+  /* Search result item */
+  .search-result-item {
+    display: flex;
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+  }
+  
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+  
+  .search-result-item:hover {
+    background-color: #f8f9fa;
+    text-decoration: none;
+  }
+  
+  /* Search result image */
+  .search-result-image-container {
+    flex-shrink: 0;
+    margin-right: 16px;
+  }
+  
+  .search-result-image {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  /* Search result content */
+  .search-result-content {
+    flex-grow: 1;
+    min-width: 0; /* Helps with text truncation */
+  }
+  
+  .search-result-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+    color: #212529;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Price styles */
+  .search-result-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  
+  .current-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc3545; /* Bootstrap danger color */
+  }
+  
+  .original-price {
+    font-size: 12px;
+    color: #6c757d; /* Bootstrap secondary color */
+    text-decoration: line-through;
+  }
+  
+  /* Scrollbar styles */
+  .search-results::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .search-results::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+  
+  .search-results::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
