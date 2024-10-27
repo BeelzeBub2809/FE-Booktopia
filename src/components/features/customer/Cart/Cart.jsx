@@ -53,10 +53,6 @@ function Cart() {
 
     const handleRemoveItem = async (productId) => {
         try {
-            console.log(typeof productId);
-            console.log(productId);
-            
-            
             const response = await CartService.removeFromCart(productId);
             Swal.fire({
                 title: 'Success',
@@ -64,6 +60,31 @@ function Cart() {
                 icon: 'success',
                 confirmButtonText: 'Ok',
             });
+            const fetchCart = async () => {
+                try {
+                    const cartData = await CartService.getCart();
+                    setCartItems(cartData);
+                    console.log(cartData);
+    
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            fetchCart();
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'Ok',
+            });
+        }
+    }
+
+    const handleChangeQuantity = async (productId, quantity, action) => {
+        try {
+            const response = await CartService.changeQuantity({ productId, quantity: quantity + (action === 'add' ? 1 : -1) });
+            console.log(response);
             const fetchCart = async () => {
                 try {
                     const cartData = await CartService.getCart();
@@ -113,7 +134,7 @@ function Cart() {
                 <div className="cart-grid">
                     <div className="cart-items-grid">
                         {cartItems.map(item => (
-                            <HorizontalProductCard item={item} handleRemoveItem={handleRemoveItem} />
+                            <HorizontalProductCard item={item} handleRemoveItem={handleRemoveItem} handleChangeQuantity={handleChangeQuantity} />
                         ))}
                     </div>
                     <ShoppingBill cartItems={cartItems} />

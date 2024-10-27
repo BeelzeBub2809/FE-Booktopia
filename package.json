@@ -26,6 +26,7 @@
     "react-player": "^2.16.0",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "react-select": "^5.8.2",
     "recharts": "^2.12.7",
     "simple-datatables": "^9.2.1",
     "sweetalert2": "^11.12.2",
