@@ -1,111 +1,108 @@
+import OrderServices from '../../../../services/order/orderServices';
 import './orders.css';
+import React, { useEffect, useState } from 'react';
 
 function OrderCustomer() {
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [filter, setFilter] = useState("All");
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await OrderServices.getOrderHistoryByUserId();
+        setOrders(data);
+        setFilteredOrders(data); // Set initial filtered orders to all orders
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  // Filtering function
+  const filterOrders = (filter) => {
+    switch (filter) {
+      case "All":
+        return orders;
+      case "Order Verification":
+        return orders.filter(order => order.status === "ready_to_pick");
+      case "Delivering":
+        return orders.filter(order => [
+          "picking", "money_collect_picking", "picked", "storing",
+          "transporting", "sorting", "delivering", "money_collect_delivering"
+        ].includes(order.status));
+      case "Completed":
+        return orders.filter(order => order.status === "delivered");
+      case "Canceled":
+        return orders.filter(order => ["cancel", "delivered", "delivery_fail"].includes(order.status));
+      case "Refund":
+        return orders.filter(order => [
+          "waiting_to_return", "return", "return_transporting", "return_sorting",
+          "returning", "return_fail", "returned"
+        ].includes(order.status));
+      default:
+        return orders;
+    }
+  };
+
+  // Handle filter change and update filtered orders
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+    setFilteredOrders(filterOrders(newFilter));
+  };
+
   return (
-    <section class="order-list-customer">
-      <div class="order-container">
-        <div class="status-bar row">
-          <div class="status-item col">All</div>
-          <div class="status-item col">Order Verification</div>
-          <div class="status-item col">Delivering</div>
-          <div class="status-item col">Completed</div>
-          <div class="status-item col">Canceled</div>
-          <div class="status-item col">Refund</div>
+    <section className="order-list-customer">
+      <div className="order-container">
+        <div className="status-bar row">
+          <div onClick={() => handleFilterChange("All")} className={`status-item col ${filter === "All" ? "active" : ""}`}>All</div>
+          <div onClick={() => handleFilterChange("Order Verification")} className={`status-item col ${filter === "Order Verification" ? "active" : ""}`}>Order Verification</div>
+          <div onClick={() => handleFilterChange("Delivering")} className={`status-item col ${filter === "Delivering" ? "active" : ""}`}>Delivering</div>
+          <div onClick={() => handleFilterChange("Completed")} className={`status-item col ${filter === "Completed" ? "active" : ""}`}>Completed</div>
+          <div onClick={() => handleFilterChange("Canceled")} className={`status-item col ${filter === "Canceled" ? "active" : ""}`}>Canceled</div>
+          <div onClick={() => handleFilterChange("Refund")} className={`status-item col ${filter === "Refund" ? "active" : ""}`}>Refund</div>
         </div>
-        <form class="search-bar">
-          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f760b4ae4f6ad618214f5c519690ff5856d4d121a7974d0f8ec787856fadc17?placeholderIfAbsent=true&apiKey=5dd4f9cda63a40ecb7fdb7955805b9bd" alt="" class="search-icon" />
-          <input type="text" placeholder="Search by Product name" class="search-input" aria-label="Search by Product name" />
+        <form className="search-bar">
+          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f760b4ae4f6ad618214f5c519690ff5856d4d121a7974d0f8ec787856fadc17?placeholderIfAbsent=true&apiKey=5dd4f9cda63a40ecb7fdb7955805b9bd" alt="" className="search-icon" />
+          <input type="text" placeholder="Search by Product name" className="search-input" aria-label="Search by Product name" />
         </form>
-        <article class="order-section">
-          <header class="order-header">
-            <p class="order-date">Order Date: 12/12/2024</p>
-            <p class="order-status">Success</p>
-          </header>
-          <hr class="divider" />
-          <div class="order-details">
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/fd5fa143090752b43fec6fa38e5c3fa7d69485cf31aaf6c39e5aff7910546239?placeholderIfAbsent=true&apiKey=5dd4f9cda63a40ecb7fdb7955805b9bd" alt="Doremon Bản giao hưởng địa cầu" class="product-image" />
-            <div class="product-info">
-              <h2 class="product-name">Doremon Bản giao hưởng địa cầu</h2>
-              <div class="product-details">
-                <p class="quantity">Quantity: 1</p>
-                <div class="price-info">
-                  <p>Price: 79000</p>
-                  <p class="discount">Discount: 2%</p>
+        {filteredOrders.map((order) => (
+          <article key={order._id} className="order-section">
+            <header className="order-header">
+              <p className="order-date">Order Date: {new Date(order.createDate).toLocaleDateString()}</p>
+              <p className="order-status">{order.status}</p>
+            </header>
+            <hr className="divider" />
+            {order.OrderDetail.map((item) => (
+              <div key={item._id} className="order-details">
+                <img src={item.productInfo.image[0]} alt={item.productInfo.name} className="product-image" />
+                <div className="product-info">
+                  <h2 className="product-name">{item.productInfo.name}</h2>
+                  <div className="product-details">
+                    <p className="quantity">Quantity: {item.quantity}</p>
+                    <div className="price-info">
+                      <p>Price: {item.productInfo.price}</p>
+                      <p className="discount">Discount: {item.productInfo.discount || 0}%</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <hr class="divider" />
-          <footer class="order-summary">
-            <p class="order-discount">Order discount: 20%</p>
-            <p class="total-price">Total: 79000</p>
-            <div class="order-actions">
-              <button class="btn btn-cancel">Cancel Order</button>
-              <button class="btn btn-track">Tracking Order</button>
-            </div>
-          </footer>
-        </article>
-        <article class="order-section">
-          <header class="order-header">
-            <p class="order-date">Order Date: 12/12/2024</p>
-            <p class="order-status">Success</p>
-          </header>
-          <hr class="divider" />
-          <div class="order-details">
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/fd5fa143090752b43fec6fa38e5c3fa7d69485cf31aaf6c39e5aff7910546239?placeholderIfAbsent=true&apiKey=5dd4f9cda63a40ecb7fdb7955805b9bd" alt="Doremon Bản giao hưởng địa cầu" class="product-image" />
-            <div class="product-info">
-              <h2 class="product-name">Doremon Bản giao hưởng địa cầu</h2>
-              <div class="product-details">
-                <p class="quantity">Quantity: 1</p>
-                <div class="price-info">
-                  <p>Price: 79000</p>
-                  <p class="discount">Discount: 2%</p>
-                </div>
+            ))}
+            <hr className="divider" />
+            <footer className="order-summary">
+              <p className="order-discount">Order discount: {order.discount || 0}%</p>
+              <p className="total-price">Total: {order.totalPrice.$numberDecimal}</p>
+              <div className="order-actions">
+                <button className="btn btn-cancel">Cancel Order</button>
+                <button className="btn btn-track">Tracking Order</button>
               </div>
-            </div>
-          </div>
-          <hr class="divider" />
-          <footer class="order-summary">
-            <p class="order-discount">Order discount: 20%</p>
-            <p class="total-price">Total: 79000</p>
-            <div class="order-actions">
-              <button class="btn btn-cancel">Cancel Order</button>
-              <button class="btn btn-track">Tracking Order</button>
-            </div>
-          </footer>
-        </article>
-        <article class="order-section">
-          <header class="order-header">
-            <p class="order-date">Order Date: 12/12/2024</p>
-            <p class="order-status">Success</p>
-          </header>
-          <hr class="divider" />
-          <div class="order-details">
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/fd5fa143090752b43fec6fa38e5c3fa7d69485cf31aaf6c39e5aff7910546239?placeholderIfAbsent=true&apiKey=5dd4f9cda63a40ecb7fdb7955805b9bd" alt="Doremon Bản giao hưởng địa cầu" class="product-image" />
-            <div class="product-info">
-              <h2 class="product-name">Doremon Bản giao hưởng địa cầu</h2>
-              <div class="product-details">
-                <p class="quantity">Quantity: 1</p>
-                <div class="price-info">
-                  <p>Price: 79000</p>
-                  <p class="discount">Discount: 2%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <hr class="divider" />
-          <footer class="order-summary">
-            <p class="order-discount">Order discount: 20%</p>
-            <p class="total-price">Total: 79000</p>
-            <div class="order-actions">
-              <button class="btn btn-cancel">Cancel Order</button>
-              <button class="btn btn-track">Tracking Order</button>
-            </div>
-          </footer>
-        </article>
+            </footer>
+          </article>
+        ))}
       </div>
     </section>
-  )
+  );
 }
 
 export default OrderCustomer;

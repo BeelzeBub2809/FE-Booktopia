@@ -43,9 +43,9 @@ function HorizontalProductCard({ item, handleRemoveItem, handleChangeQuantity })
                 <button className="solid-primary-btn" onClick={() => handleRemoveItem(item.productId._id)}>
                   Remove from Cart
                 </button>
-                <button className={isCheckout ? "btn btn-success": "outline-primary-btn"} onClick={handleChooseToCheckout}>
+                {/* <button className={isCheckout ? "btn btn-success": "outline-primary-btn"} onClick={handleChooseToCheckout}>
                   Choose to checkout
-                </button>
+                </button> */}
               </div>
               <div className="badge-on-card">
                 {/* Badge content nếu có */}
