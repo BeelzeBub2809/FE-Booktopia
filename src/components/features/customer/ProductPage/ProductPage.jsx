@@ -57,7 +57,10 @@ function ProductPage() {
       );
       if (!reviewResponse.ok) throw new Error("Failed to fetch product reviews.");
       const reviewData = await reviewResponse.json();
-      setReviews(reviewData.data);
+
+      // Filter reviews to only include those with status "active"
+      const activeReviews = reviewData.data.filter(review => review.status === "active");
+      setReviews(activeReviews);
     } catch (err) {
       setError(err.message);
     }
@@ -114,7 +117,7 @@ function ProductPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to submit review");
+      if (!res.ok) throw new Error("You have already reviewed this product.");
       // Fetch the updated reviews after submitting the new review
       await fetchReviews(); // Call the function to fetch reviews
 
@@ -124,7 +127,7 @@ function ProductPage() {
 
       Swal.fire({
         title: "Success",
-        text: "Review submitted successfully!",
+        text: "Review was created successfully",
         icon: "success",
         confirmButtonText: "Ok",
       });
@@ -137,6 +140,34 @@ function ProductPage() {
       });
     }
   };
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      const res = await fetch(`http://localhost:9999/api/review/${reviewId}`, {
+        method: "DELETE",
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete the review.");
+      
+      // Fetch updated reviews after deletion
+      await fetchReviews(); // Call the function to fetch reviews again
+  
+      Swal.fire({
+        title: "Success",
+        text: "Review deleted successfully",
+        icon: "success",
+        confirmButtonText: "Ok",
+      });
+    } catch (err) {
+      Swal.fire({
+        title: "Error",
+        text: err.message,
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+    }
+  };
+
+  console.log(reviews);
 
   return (
     <div className="product-page-container container mt-5">
@@ -215,20 +246,31 @@ function ProductPage() {
       <div className="container mt-5">
         <h3>Product Reviews</h3>
         <div className="review-list p-3">
-          {reviews.length > 0 ? (
-            reviews.map((review, index) => (
-              <div key={review._id} className="review-item">
-                <div className="review-header">
-                  <strong>{review.customerId.userId.userName}</strong>
-                  <span className="rating">{"⭐".repeat(review.rating)}</span>
-                </div>
-                <p>{review.content}</p>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="review-item">
+              <div className="review-header">
+                <strong>{review.customerId.userId.userName}</strong>
+                <span className="rating">{"⭐".repeat(review.rating)}</span>
+                {/* Check if the review belongs to the current user */}
+                {review.customerId.userId._id === localStorage.getItem("userId").replace(/"/g, '') && (
+                  <button
+                  className="btn btn-danger btn-sm ms-2 float-end"
+                  onClick={() => handleDeleteReview(review._id)}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </button>
+                
+                )}
               </div>
-            ))
-          ) : (
-            <p>No reviews available</p>
-          )}
-        </div>
+              <p>{review.content}</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews available</p>
+        )}
+      </div>
+      
 
         <h4>Write a Review</h4>
         <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
