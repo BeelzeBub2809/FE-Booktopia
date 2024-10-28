@@ -11,15 +11,33 @@ function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
+    const id = userId ? userId.replace(/"/g, '') : null;
     if (userId) {
       setIsLoggedIn(true);
+      fetchUserData(id);
     } else {
       setIsLoggedIn(false);
     }
   }, []);
+
+  const fetchUserData = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:9999/api/user/${id}`);
+      const result = await response.json();
+      if (result.status === "success") {
+        setUser(result.data);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUser(null);
+    }
+  };
 
   const handleSearch = async (event) => {
     const value = event.target.value;
@@ -59,6 +77,7 @@ function Header() {
     setIsLoggedIn(false);
     navigation("/login-res");
   };
+
 
   return (
     <div className="top-bar">
@@ -162,17 +181,22 @@ function Header() {
             </div>
           </button>
         </Link>
-
+        {isLoggedIn && user && (
         <button className="icon-btn" onClick={handleShowProfileModal}>
           <div className="icon-count-badge">
             <i className="fa-solid fa-user"></i>
           </div>
         </button>
+      )}
       </div>
-      <UserProfileModal
-        showModal={showProfileModal}
-        handleCloseModal={handleCloseProfileModal}
-      />
+      {isLoggedIn && user && (
+        <UserProfileModal
+          showModal={showProfileModal}
+          handleCloseModal={handleCloseProfileModal}
+          user={user}
+        />
+      )}
+      
     </div>
   );
 }

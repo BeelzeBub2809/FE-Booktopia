@@ -50,7 +50,6 @@ const removeFromCart = async (productId) => {
           productId: productId,
           quantity: 0,
       };
-      console.log(productId);
       
       let response = await fetch(`http://localhost:9999/api/cart/${userId}/update`, {
           method: 'POST',
