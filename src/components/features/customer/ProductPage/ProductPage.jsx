@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import bookCover from "../../../../Assets/Images/Book_Covers/50_Shades_Of_Grey.jpg";
 import "./ProductPage.css";
 import CartService from "../../../../services/cart/cartService";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 
 function ProductPage() {
   const { id } = useParams();
@@ -15,7 +14,7 @@ function ProductPage() {
   const [allBook, setAllBook] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(0); // // State for reviews
+  const [rating, setRating] = useState(0); // State for reviews
 
   // Combined fetch for product, related books, and reviews
   useEffect(() => {
@@ -40,13 +39,7 @@ function ProductPage() {
         setAllBook(allProductsData.data);
 
         // Fetch reviews for the product
-        const reviewResponse = await fetch(
-          `http://localhost:9999/api/review/book/${id}`
-        );
-        if (!reviewResponse.ok)
-          throw new Error("Failed to fetch product reviews.");
-        const reviewData = await reviewResponse.json();
-        setReviews(reviewData.data);
+        await fetchReviews(); // Fetch reviews initially
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,6 +49,19 @@ function ProductPage() {
 
     fetchProductData();
   }, [id]);
+
+  const fetchReviews = async () => {
+    try {
+      const reviewResponse = await fetch(
+        `http://localhost:9999/api/review/book/${id}`
+      );
+      if (!reviewResponse.ok) throw new Error("Failed to fetch product reviews.");
+      const reviewData = await reviewResponse.json();
+      setReviews(reviewData.data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -109,8 +115,10 @@ function ProductPage() {
       });
 
       if (!res.ok) throw new Error("Failed to submit review");
-      const newReview = await res.json();
-      setReviews([...reviews, newReview.data]);
+      // Fetch the updated reviews after submitting the new review
+      await fetchReviews(); // Call the function to fetch reviews
+
+      // Reset comment and rating state
       setComment("");
       setRating(0);
 
@@ -187,7 +195,7 @@ function ProductPage() {
             <b>Rating: </b> 5
           </p>
           <h3 className="product-price">
-            <b className="product-price-new">{product.price}VND</b>
+            <b className="product-price-new">{product.price} VND</b>
             <del className="product-price-old">{product.price}</del> VND
             <span className="product-discount">(20% off)</span>
           </h3>
@@ -290,4 +298,4 @@ function ProductPage() {
   );
 }
 
-export { ProductPage };
+export {ProductPage};

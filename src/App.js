@@ -7,6 +7,7 @@ import {
   Header
 } from "./index.js"
 import SaleLayout from './layouts/sale/saleLayout.jsx';
+import MarketerLayout from './layouts/marketer/marketerLayout.jsx';
 import NoAccessPage from './components/common/auth/errorPage/noPermission.jsx';
 import PrivateRoute from './components/common/auth/privateRoute/privateRoute.jsx';
 
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/*" element={<CustomerLayout/>} />
           <Route path='/sale/*' element={<SaleLayout/>} />
+          <Route path='marketer/*' element={<MarketerLayout/>} />
           <Route path="/no-access" element={<NoAccessPage />} />
         </Routes>
       </div>
