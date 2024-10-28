@@ -1,19 +1,12 @@
-import React,{ useEffect, useState } from 'react'
-import { Link } from "react-router-dom"
-import { useLocation } from "react-router-dom"
-import LibraryIllustration from "../../../../Assets/Images/Library_Illustration_1.jpg"
-import LoadingLottie from "../../../../Assets/Lottie/loading-0.json"; 
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from "react-router-dom";
+import LibraryIllustration from "../../../../Assets/Images/Library_Illustration_1.jpg";
+import LoadingLottie from "../../../../Assets/Lottie/loading-0.json";
 import Lottie from "react-lottie"; // Lottie for animation
-import './Home.css'
-import {  
-  GenreCard, 
-  NewArrivals,
-  Footer
-} from "../Index/index.js"
-
+import './Home.css';
+import { GenreCard, NewArrivals, Footer } from "../Index/index.js";
 
 function Home() {
-
   const [genre, setGenre] = useState([]);
   const [loading, setLoading] = useState(true); // Add loading state
 
@@ -31,15 +24,14 @@ function Home() {
     fetch("http://localhost:9999/api/category")
       .then(response => response.json())
       .then(data => {
-        setGenre(data.data); // Set the fetched products to state
+        setGenre(data.data.slice(0, 5)); // Limit to the 5 most recent genres
         setLoading(false); // Set loading to false after data is fetched
       })
       .catch(error => {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching genres:", error);
         setLoading(false); // Stop loading even if there's an error
       });
   }, []);
- 
 
   const { pathname } = useLocation();
 
@@ -55,36 +47,39 @@ function Home() {
 
       <h1 className='homepage-headings'>Genres</h1>
       <div className='genre-cards-container'>
-          
         {loading ? (
           <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
         ) : (
           genre.length > 0 ? (
             genre.map(genre => (
-              <GenreCard key={genre.id} genre={genre} /> // Render ProductCard for each product
+              <GenreCard key={genre.id} genre={genre} /> // Render GenreCard for each genre
             ))
           ) : (
-            <p>No genres available.</p> // Message if no products are found
+            <p>No genres available.</p> // Message if no genres are found
           )
         )}
-
       </div>
-          <div className='explore-btn'>
-          <Link to={"/shop"}>
-          <button 
-            className="solid-secondary-btn homepage-explore-all-btn" >
+      
+      <div className='explore-btn'>
+        <Link to={"/shop"}>
+          <button className="solid-secondary-btn homepage-explore-all-btn">
             Explore All
           </button>
         </Link>
-          </div>
-
+      </div>
 
       <h1 className='homepage-headings'>New Arrivals</h1>
-      <NewArrivals/>
-      <Footer/>
-
+      <NewArrivals />
+      <div className='explore-btn'>
+      <Link to={"/shop"}>
+        <button className="solid-secondary-btn homepage-explore-all-btn">
+          Explore All
+        </button>
+      </Link>
     </div>
-  )
+      <Footer />
+    </div>
+  );
 }
 
 export { Home };

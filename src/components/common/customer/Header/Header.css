@@ -101,6 +101,7 @@
   
   /* Search results container */
   .search-results {
+    width: 360px;
     position: absolute;
     top: 100%;
     left: 0;

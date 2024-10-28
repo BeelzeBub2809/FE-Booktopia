@@ -22,9 +22,10 @@ function NewArrivals() {
     fetch("http://localhost:9999/api/product")
       .then(response => response.json())
       .then(data => {
-        console.log(data.data);
-        
-        setProducts(data.data); // Set the fetched products to state
+        const sortedProducts = data.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        ); // Sort products by newest first
+        setProducts(sortedProducts.slice(0, 4)); // Take only the 4 most recent products
         setLoading(false); // Set loading to false after data is fetched
       })
       .catch(error => {
