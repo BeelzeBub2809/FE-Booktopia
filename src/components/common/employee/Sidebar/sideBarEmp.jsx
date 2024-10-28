@@ -34,7 +34,7 @@ function SideBarEmp() {
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="pages-contact.html">
+          <a class="nav-link collapsed" href="/sale/order">
             <i class="bi bi-bag-check"></i>
             <span>Order</span>
           </a>
