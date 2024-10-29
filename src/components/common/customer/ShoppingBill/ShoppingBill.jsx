@@ -10,11 +10,11 @@ const options = [
   { value: 'vanilla', label: 'Vanilla' },
 ];
 
-function ShoppingBill({ cartItems }) {  
+function ShoppingBill({ cartItems }) {
   const [deliveryCharges, setDeliveryCharges] = React.useState(0);
   const finalBillBeforeDiscount =
     cartItems.reduce((total, cartItem) => {
-      return total + cartItem.productId.price * cartItem.amount;
+      return total + cartItem.productId.price * (cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount);
     }, 0)
 
   let finalBill = 0;
@@ -35,8 +35,10 @@ function ShoppingBill({ cartItems }) {
   const [fullName, setFullName] = React.useState('');
   const formattedProducts = cartItems.map(item => ({
     productId: item.productId._id,
-    quantity: item.amount.toString(),
+    quantity: item.amount > item.productId.quantityInStock ? item.productId.quantityInStock.toString() : item.amount.toString(),
   }));
+
+  
   const isFormComplete = selectedProvince && selectedDistrict && selectedWard && detailAddress && phone && fullName;
   const handlePreviewOrder = async () => {
     const requestData = {
@@ -93,36 +95,49 @@ function ShoppingBill({ cartItems }) {
       payment_type_id: 2,
       total_price: finalBill,
       total_discount: totalDiscount,
-    };    
-    try {
-      const response = await fetch('http://localhost:9999/api/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-      Swal.fire({
-        icon: 'success',
-        title: 'Place order successful',
-        text: 'Your order was placed successful!',
-        confirmButtonText: 'OK'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = '/orders'; // Redirect to the /orders page
-        }
-      });
-    } catch (error) {
+    };
+    if (!isFormComplete) {
       Swal.fire({
         icon: 'error',
-        title: 'Preview Failed',
-        text: `Failed to preview order: ${error.message}`,
+        title: 'Error',
+        text: 'Please fill in all required fields',
       });
+    } else {
+      try {
+        const response = await fetch('http://localhost:9999/api/order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to place order');
+        }
+        Swal.fire({
+          icon: 'success',
+          title: 'Place order successful',
+          text: 'Your order was placed successfully!',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/orders';
+          }
+        });
+
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Order Failed',
+          text: error.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      }
+
     }
+
   };
 
   useEffect(() => {
@@ -195,10 +210,10 @@ function ShoppingBill({ cartItems }) {
               <p>{cartItem.productId.name}</p>
             </div>
             <div className="cart-item-quantity">
-              <p>X {cartItem.amount}</p>
+              <p>X {cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount}</p>
             </div>
             <div className="cart-item-total-price" id="price-sum">
-              <p>{cartItem.productId.price * cartItem.amount} VND</p>
+              <p>{cartItem.productId.price * (cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount)} VND</p>
             </div>
           </div>
         );
@@ -323,7 +338,7 @@ function ShoppingBill({ cartItems }) {
         <p>Orders over 500K get a 20% discount, up to 100K.</p>
       </div>
 
-      <button className="place-order-btn solid-secondary-btn" onClick={handleCreateOrder} disabled={!isFormComplete}>
+      <button className="place-order-btn solid-secondary-btn" onClick={handleCreateOrder}>
         Place Order
       </button>
     </div>
