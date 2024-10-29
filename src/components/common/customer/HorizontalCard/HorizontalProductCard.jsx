@@ -26,16 +26,22 @@ function HorizontalProductCard({ item, handleRemoveItem, handleChangeQuantity })
               <div className="item-cart-quantity">
                 <p className="cart-quantity-para">Quantity : &nbsp;&nbsp;</p>
                 <div className="quantity-manage-container">
-                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount, "sub")}>-</div>
+                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount, "sub")}>-</div>
                   <input
                     className="cart-item-quantity-input"
-                    type="text"
-                    value={item.amount}
-                    maxLength="3"
+                    type="number"
+                    min={1}
+                    max={item.productId.quantityInStock}
+                    value={item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount}
                     autoComplete="off"
-                    readOnly
+                    onChange={(e) => {
+                      let newQuantity = parseInt(e.target.value, 10);
+                      if (newQuantity < 1) newQuantity = 1;
+                      else if (newQuantity > item.productId.quantityInStock) newQuantity = item.productId.quantityInStock;
+                      handleChangeQuantity(item.productId._id, newQuantity, 'input');
+                    }}
                   />
-                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount, "add")}>+</div>
+                  <div className="quantity-change" onClick={() => handleChangeQuantity(item.productId._id, item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount, "add")}>+</div>
                 </div>
               </div>
 

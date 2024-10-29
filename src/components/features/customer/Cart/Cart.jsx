@@ -83,7 +83,12 @@ function Cart() {
 
     const handleChangeQuantity = async (productId, quantity, action) => {
         try {
-            const response = await CartService.changeQuantity({ productId, quantity: quantity + (action === 'add' ? 1 : -1) });
+            if(action === 'input') {
+                const response = await CartService.changeQuantity({ productId, quantity });
+            } else {
+                const response = await CartService.changeQuantity({ productId, quantity: quantity + (action === 'add' ? 1 : -1) });
+            }
+            
             const fetchCart = async () => {
                 try {
                     const cartData = await CartService.getCart();
