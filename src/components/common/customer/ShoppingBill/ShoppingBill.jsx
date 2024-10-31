@@ -36,6 +36,8 @@ function ShoppingBill({ cartItems }) {
   const formattedProducts = cartItems.map(item => ({
     productId: item.productId._id,
     quantity: item.amount > item.productId.quantityInStock ? item.productId.quantityInStock.toString() : item.amount.toString(),
+    total_price: (item.productId.price * (item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount)),
+    type: 'single'
   }));
 
   

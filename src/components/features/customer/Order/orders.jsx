@@ -11,6 +11,8 @@ function OrderCustomer() {
     const fetchOrders = async () => {
       try {
         const data = await OrderServices.getOrderHistoryByUserId();
+        console.log(data);
+        
         setOrders(data);
         setFilteredOrders(data); // Set initial filtered orders to all orders
       } catch (error) {
@@ -26,10 +28,10 @@ function OrderCustomer() {
       case "All":
         return orders;
       case "Order Verification":
-        return orders.filter(order => order.status === "ready_to_pick");
+        return orders.filter(order => order.status === 'confirming');
       case "Delivering":
         return orders.filter(order => [
-          "picking", "money_collect_picking", "picked", "storing",
+          "ready_to_pick","picking", "money_collect_picking", "picked", "storing",
           "transporting", "sorting", "delivering", "money_collect_delivering"
         ].includes(order.status));
       case "Completed":
@@ -71,7 +73,11 @@ function OrderCustomer() {
           <article key={order._id} className="order-section">
             <header className="order-header">
               <p className="order-date">Order Date: {new Date(order.createDate).toLocaleDateString()}</p>
-              <p className="order-status">{order.status}</p>
+              <p className="order-status">Status: {order.status}</p>
+              <hr className="divider" />
+              <p className="receiver-name">Receiver: {order.receiver_name}</p>
+              <p className="receiver-phone">Phone: {order.receiver_phone}</p>
+              <p className="receiver-address">Address: {order.receiver_address}, {order.receiver_ward_name}, {order.receiver_district_name}, {order.receiver_province_name}</p>
             </header>
             <hr className="divider" />
             {order.OrderDetail.map((item) => (
@@ -82,7 +88,7 @@ function OrderCustomer() {
                   <div className="product-details">
                     <p className="quantity">Quantity: {item.quantity}</p>
                     <div className="price-info">
-                      <p>Price: {item.productInfo.price}</p>
+                      <p>Price: {item.productInfo.price} VND</p>
                       <p className="discount">Discount: {item.productInfo.discount || 0}%</p>
                     </div>
                   </div>
@@ -92,7 +98,7 @@ function OrderCustomer() {
             <hr className="divider" />
             <footer className="order-summary">
               <p className="order-discount">Order discount: {order.discount || 0}%</p>
-              <p className="total-price">Total: {order.totalPrice.$numberDecimal}</p>
+              <p className="total-price">Total: {order.totalPrice?.$numberDecimal || 0} VND</p>
               <div className="order-actions">
                 <button className="btn btn-cancel">Cancel Order</button>
                 <button className="btn btn-track">Tracking Order</button>
