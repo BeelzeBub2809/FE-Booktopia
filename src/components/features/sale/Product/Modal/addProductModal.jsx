@@ -82,7 +82,7 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setProduct({ ...product, image: reader.result });
+        setProduct({ ...product, image: reader.result.split(",")[1] });
       };
       reader.readAsDataURL(file);
     }
@@ -130,7 +130,7 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
             <div className="modal-dialog modal-lg modal-dialog-centered" role='document'>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Add Product</h5>
+                  <h5 className="modal-title">Add Product To Stock</h5>
                 </div>
                 <div className="modal-body">
                   <div className="d-flex" style={{ gap: '20px' }}>
@@ -183,10 +183,10 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                         <label>Price</label>
                         <input type="number" className="form-control" name="price" value={product.price} onChange={handleChange} />
                       </div>
-                      <div className="form-group mb-3 d-flex flex-column text-start text-dark">
+                      {/* <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Quantity In Stock</label>
                         <input type="number" className="form-control" name="quantityInStock" value={product.quantityInStock} onChange={handleChange} />
-                      </div>
+                      </div> */}
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Publisher</label>
                         <input type="text" className="form-control" name="publisher" value={product.publisher} onChange={handleChange} />

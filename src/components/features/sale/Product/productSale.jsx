@@ -97,9 +97,7 @@ function ProductSale() {
 
   const handleChangeActive = async (id, status) => {
     try {
-      console.log(id, status);
       const res = await ProductService.updateProduct({_id:id, status: status === 'active' ? 'inactive' : 'active'});
-      console.log(res);
       
       Swal.fire({
         title: `successfully`,
@@ -156,13 +154,13 @@ function ProductSale() {
                           <td>{p.quantityInStock}</td>
                           <td>{p.publisher}</td>
                           <td>{p.status}</td>
-                          <td>
-                            <button className="btn btn-warning btn-sm me-2">Edit</button>
+                          <td style={{width: '230px'}}>
+                            <button className="btn btn-warning me-2">Edit</button>
                             {
                               p.status === 'active' ? (
-                                <button className="btn btn-success btn-sm">Active</button>
+                                <button className="btn btn-success " style={{width:"100px"}}>Active</button>
                               ) : (
-                                <button className="btn btn-danger btn-sm">Inactive</button>
+                                <button className="btn btn-danger " style={{width:"100px"}}>Inactive</button>
                               )
                             }
                           </td>

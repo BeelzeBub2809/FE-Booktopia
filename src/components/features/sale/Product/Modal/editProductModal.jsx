@@ -20,6 +20,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
       categoryId: [],
       description: '',
       releaseDate: new Date(),  
+      image: '',
   });
   const loadingObj = {
     loop: true,
@@ -43,6 +44,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
       });
 
     if (item) {
+      setImagePreview(item.image[0]);
       setSelectedItem({...item, releaseDate: item.releaseDate ? new Date(item.releaseDate).toISOString().split('T')[0] : ''});
     }
   }, [item]);
@@ -92,7 +94,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreview(reader.result);
-          setSelectedItem({ ...selectedItem, image: reader.result });
+          setSelectedItem({ ...selectedItem, image: reader.result.split(",")[1] });
         };
         reader.readAsDataURL(file);
       }
@@ -188,7 +190,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                             <label>Quantity In Stock</label>
-                            <input type="number" className="form-control" name="quantityInStock" value={selectedItem.quantityInStock} onChange={handleChange} />
+                            <input disabled type="number" className="form-control" name="quantityInStock" value={selectedItem.quantityInStock}/>
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                             <label>Publisher</label>
