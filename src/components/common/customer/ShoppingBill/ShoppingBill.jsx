@@ -3,14 +3,8 @@ import React from "react";
 import Select from 'react-select';
 import { useEffect } from "react";
 import Swal from "sweetalert2";
-
-const options = [
-  { value: 'chocolate', label: 'Chocolate' },
-  { value: 'strawberry', label: 'Strawberry' },
-  { value: 'vanilla', label: 'Vanilla' },
-];
-
 function ShoppingBill({ cartItems }) {
+  const [paymentMethod, setPaymentMethod] = React.useState("cod");
   const [deliveryCharges, setDeliveryCharges] = React.useState(0);
   const finalBillBeforeDiscount =
     cartItems.reduce((total, cartItem) => {
@@ -40,7 +34,7 @@ function ShoppingBill({ cartItems }) {
     type: 'single'
   }));
 
-  
+
   const isFormComplete = selectedProvince && selectedDistrict && selectedWard && detailAddress && phone && fullName;
   const handlePreviewOrder = async () => {
     const requestData = {
@@ -105,18 +99,26 @@ function ShoppingBill({ cartItems }) {
         text: 'Please fill in all required fields',
       });
     } else {
+      const apiUrl = paymentMethod === "cod"
+        ? 'http://localhost:9999/api/order'
+        : 'http://localhost:9999/api/payment/create-payment-link';
       try {
-        const response = await fetch('http://localhost:9999/api/order', {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(requestData),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to place order');
+        }
+        const data = await response.json()
+        if (data && data.payUrl) {
+          window.location.href = data.payUrl
         }
         Swal.fire({
           icon: 'success',
@@ -285,15 +287,29 @@ function ShoppingBill({ cartItems }) {
             style={{ minHeight: "38px" }}
           />
         </div>
-        <div class="form-check" style={{ fontSize: "large" }}>
-          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
-          <label class="form-check-label" for="flexRadioDefault1">
+        <div className="form-check" style={{ fontSize: "large" }}>
+          <input
+            className="form-check-input"
+            type="radio"
+            name="paymentMethod"
+            value="cod"
+            checked={paymentMethod === "cod"}
+            onChange={() => setPaymentMethod("cod")}
+          />
+          <label className="form-check-label">
             COD
           </label>
         </div>
-        <div class="form-check" style={{ fontSize: "large" }}>
-          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked />
-          <label class="form-check-label" for="flexRadioDefault2">
+        <div className="form-check" style={{ fontSize: "large" }}>
+          <input
+            className="form-check-input"
+            type="radio"
+            name="paymentMethod"
+            value="internetBanking"
+            checked={paymentMethod === "internetBanking"}
+            onChange={() => setPaymentMethod("internetBanking")}
+          />
+          <label className="form-check-label">
             Internet Banking
           </label>
         </div>

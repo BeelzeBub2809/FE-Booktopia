@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { BsShopWindow, BsFillBagFill, BsFillPersonFill } from "react-icons/bs";
 import UserProfileModal from "../../modal/userProfileModal";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function Header() {
   const navigation = useNavigate();
@@ -27,15 +28,18 @@ function Header() {
   const fetchUserData = async (id) => {
     try {
       const response = await fetch(`http://localhost:9999/api/user/${id}`);
-      const result = await response.json();
+      const result = await response.json();      
       if (result.status === "success") {
         setUser(result.data);
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      setUser(null);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message,
+      });
     }
   };
 
@@ -95,7 +99,7 @@ function Header() {
               onChange={handleSearch}
             />
             {searchResults.length > 0 && (
-              <div className="search-results">
+              <div className="search-results2">
                 {searchResults.map((item) => (
                   <Link
                     to={`/shop/${item._id}`}

@@ -58,7 +58,7 @@ function HeaderEmp() {
 
         </ul>
       </div>
-      <UserProfileModal showModal={showProfileModal} handleCloseModal={handleCloseProfileModal} />
+      
     </header>
   );
 }
