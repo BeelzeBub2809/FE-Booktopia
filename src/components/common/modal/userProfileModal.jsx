@@ -5,11 +5,14 @@ import Swal from 'sweetalert2';
 
 export default function UserProfileModal({ showModal, handleCloseModal, user }) {
   const [imagePreview, setImagePreview] = useState('https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg');
-  const userAddress = user.address?.split(", ") || [];
+  console.log(user);
+  
+  const userAddress = user.address ? user.address.split(", ") : [];
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [address, setAddress] = useState(userAddress[0] || '');
+  
 
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);

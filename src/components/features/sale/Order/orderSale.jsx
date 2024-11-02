@@ -34,12 +34,7 @@ function OrderSale() {
         setOrders(response);
       });
     } catch (error) {
-      Swal.fire({
-        title: 'Error',
-        text: error.message,
-        icon: 'error',
-        confirmButtonText: 'Ok',
-      });
+      console.log(error.message);
     }
   };
 
