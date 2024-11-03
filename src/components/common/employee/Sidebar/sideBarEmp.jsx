@@ -1,14 +1,24 @@
 import './sideBarEmp.css';
 
 function SideBarEmp() {
-  const role = JSON.parse(localStorage.getItem("userRoles")); 
+  const role = JSON.parse(localStorage.getItem("userRoles")) || [];
 
   const isMarketer = role.includes("marketer");
+  const isAdmin = role.includes("admin");
 
   return (
     <aside id="sidebar" className="sidebar">
       <ul className="sidebar-nav" id="sidebar-nav">
-        {isMarketer ? (
+        {isAdmin ? (
+          // Only show the User menu item for admin
+          <li className="nav-item">
+            <a className="nav-link collapsed" href="/admin/user">
+              <i className="bi bi-people"></i>
+              <span>User</span>
+            </a>
+          </li>
+        ) : isMarketer ? (
+          // Only show the Review menu item for marketer
           <li className="nav-item">
             <a className="nav-link collapsed" href="/marketer/review">
               <i className="bi bi-bag-check"></i>
@@ -16,6 +26,7 @@ function SideBarEmp() {
             </a>
           </li>
         ) : (
+          // Default items for other roles
           <>
             <li className="nav-item">
               <a className="nav-link collapsed" href="#">
