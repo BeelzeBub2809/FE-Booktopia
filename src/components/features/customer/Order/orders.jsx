@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import OrderServices from '../../../../services/order/orderServices';
 import './orders.css';
 import React, { useEffect, useState } from 'react';
@@ -12,7 +13,7 @@ function OrderCustomer() {
       try {
         const data = await OrderServices.getOrderHistoryByUserId();
         console.log(data);
-        
+
         setOrders(data);
         setFilteredOrders(data); // Set initial filtered orders to all orders
       } catch (error) {
@@ -21,6 +22,24 @@ function OrderCustomer() {
     };
     fetchOrders();
   }, []);
+
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await OrderServices.cancelOnConfirmOrder(orderId);
+      Swal.fire({
+        title: 'Success',
+        text: 'Order canceled successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      }).then(async () => {
+        const response = await OrderServices.getOrderHistoryByUserId();
+        setOrders(response);
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   // Filtering function
   const filterOrders = (filter) => {
@@ -31,7 +50,7 @@ function OrderCustomer() {
         return orders.filter(order => order.status === 'confirming');
       case "Delivering":
         return orders.filter(order => [
-          "ready_to_pick","picking", "money_collect_picking", "picked", "storing",
+          "ready_to_pick", "picking", "money_collect_picking", "picked", "storing",
           "transporting", "sorting", "delivering", "money_collect_delivering"
         ].includes(order.status));
       case "Completed":
@@ -86,7 +105,7 @@ function OrderCustomer() {
                 <div className="product-info">
                   <h2 className="product-name">{item.productInfo.name}</h2>
                   <div className="product-details">
-                    <p className="quantity">Quantity: {item.quantity}</p>
+                    <p className="quantity">Quantity: {item.amount}</p>
                     <div className="price-info">
                       <p>Price: {item.productInfo.price} VND</p>
                       <p className="discount">Discount: {item.productInfo.discount || 0}%</p>
@@ -100,8 +119,12 @@ function OrderCustomer() {
               <p className="order-discount">Order discount: {order.discount || 0}%</p>
               <p className="total-price">Total: {order.totalPrice?.$numberDecimal || 0} VND</p>
               <div className="order-actions">
-                <button className="btn btn-cancel">Cancel Order</button>
-                <button className="btn btn-track">Tracking Order</button>
+                {order.status === "delivered" && (
+                  <button className="btn btn-track">Refund Order</button>
+                )}
+                {order.status === "confirming" && (
+                  <button className="btn btn-cancel" onClick={() => handleCancelOrder(order._id)}>Cancel Order</button>
+                )}
               </div>
             </footer>
           </article>
