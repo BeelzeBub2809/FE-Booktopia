@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import './productSale.css';
+import './comboSale.css';
 import { DataTable } from 'simple-datatables';
-import AddProductModal from './Modal/addProductModal';
-import EditProductModal from './Modal/editProductModal';
+import AddComboModal from './Modal/addComboModal';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
 import Lottie from "react-lottie"; 
-import ProductService from '../../../../services/product/productService';
+import ComboService from '../../../../services/combo/comboServices';
 import Swal from 'sweetalert2';
+import EditComboModal from './Modal/editComboModal';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
-function ProductSale() {
-  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+function ComboSale() {
+  const [showAddModal, setShowAddModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -26,7 +26,7 @@ function ProductSale() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:9999/api/product", {
+    fetch("http://localhost:9999/api/combo", {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -68,27 +68,26 @@ function ProductSale() {
             const target = event.target;
             const row = target.closest('tr');
             const rowIndex = row ? row.getAttribute('data-index') : null;
-            const selectedProduct = data[rowIndex];
+            const selectedCombo = data[rowIndex];
 
             if (target.classList.contains('btn-warning')) {
-              setSelectedItem(selectedProduct);
+              setSelectedItem(selectedCombo);
               setShowEditModal(true);
             } else if (target.classList.contains('btn-success') || target.classList.contains('btn-danger')) {
-              handleChangeActive(selectedProduct._id, selectedProduct.status);
+              handleChangeActive(selectedCombo._id, selectedCombo.status);
             }
           });
         });
       }
     }
   }, [data, loading]);
-  
 
-  const openAddProductModal = () => {
-    setIsAddProductModalOpen(true);
+  const openAddCoomboModal = () => {
+    setShowAddModal(true);
   };
 
-  const closeAddProductModal = () => {
-    setIsAddProductModalOpen(false);
+  const closeAddComboModal = () => {
+    setShowAddModal(false);
   };
 
   const handleCloseEditModal = () => {
@@ -97,7 +96,7 @@ function ProductSale() {
 
   const handleChangeActive = async (id, status) => {
     try {
-      const res = await ProductService.updateProduct({_id:id, status: status === 'active' ? 'inactive' : 'active'});
+      const res = await ComboService.updateCombo({_id:id, status: status === 'active' ? 'inactive' : 'active'});
       
       Swal.fire({
         title: `successfully`,
@@ -118,11 +117,10 @@ function ProductSale() {
       });
     }
   }
-
   return (
-    <main id="main" className="main">
+     <main id="main" className="main">
       <div className="pagetitle">
-        <h2>Manage Product</h2>
+        <h2>Manage Combo</h2>
       </div>
 
       <section className="section">
@@ -130,61 +128,61 @@ function ProductSale() {
           <div className="col-lg-12">
             <div className="card">
               <div className="card-body">
-                <button className="btn btn-primary mb-3" onClick={openAddProductModal}>Create Product</button>
+                <button className="btn btn-primary mb-3" onClick={openAddCoomboModal}>Create Combo</button>
                 { loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
-                ) : (
-                <table className="table datatable">
-                  <thead>
-                    <tr>
-                      <th>Image</th>
-                      <th>ISBN</th>
-                      <th>Name</th>
-                      <th>Quantity In Stock</th>
-                      <th>Publisher</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                   {
-                    data?.map((p, index) => (
-                        <tr key={p._id} data-index={index}> {/* Add data-index to track the row */}
-                          <td>
-                            {p.image && p.image.length > 0 ? (
-                              <img src={p.image[0]} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                            ) : (
-                              <img src={IMAGE_DEFAULT} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                            )}
-                          </td>
-                          <td>{p.isbn}</td>
-                          <td>{p.name}</td>
-                          <td>{p.quantityInStock}</td>
-                          <td>{p.publisher}</td>
-                          <td style={{width: '230px'}}>
-                            <button className="btn btn-warning me-2">Edit</button>
-                            {
-                              p.status === 'active' ? (
-                                <button className="btn btn-success " style={{width:"100px"}}>Active</button>
+                  ) : (
+                  <table className="table datatable">
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>discount</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        data?.map((p, index) => (
+                          <tr key={p._id} data-index={index}>
+                            <td>
+                              {p.image && p.image.length > 0 ? (
+                                <img src={p.image[0]} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
                               ) : (
-                                <button className="btn btn-danger " style={{width:"100px"}}>Inactive</button>
-                              )
-                            }
-                          </td>
-                        </tr>
-                      ))
-                    }
-                  </tbody>
-                </table>
+                                <img src={IMAGE_DEFAULT} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                              )}
+                            </td>
+                            <td>{p.name}</td>
+                            <td>{p.quantity}</td>
+                            <td>{p.discount.$numberDecimal}%</td>
+                            <td>{p.price.$numberDecimal} VND</td>
+                            <td style={{width: '230px'}}>
+                              <button className="btn btn-warning me-2">Edit</button>
+                              {
+                                p.status === 'active' ? (
+                                  <button className="btn btn-success " style={{width:"100px"}}>Active</button>
+                                ) : (
+                                  <button className="btn btn-danger " style={{width:"100px"}}>Inactive</button>
+                                )
+                              }
+                            </td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
                 )}
               </div>
             </div>
           </div>
         </div>
       </section>
-      <AddProductModal showModal={isAddProductModalOpen} handleCloseModal={closeAddProductModal}/>
-      <EditProductModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/>
+			<AddComboModal showModal={showAddModal} handleCloseModal={closeAddComboModal}/>
+      <EditComboModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/>
     </main>
   );
 }
 
-export default ProductSale;
+export default ComboSale;
