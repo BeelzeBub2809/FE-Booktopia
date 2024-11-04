@@ -2,12 +2,15 @@ import React from "react";
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
 
-
-
 function ProductCard({ product }) {
+  // Xác định đường dẫn dựa trên type của product
+  const productLink = product.type === 'combo'
+    ? `/shop/combo/${product._id}`
+    : `/shop/${product._id}`;
+
   return (
     <div className="card-basic">
-      <Link to={`/shop/${product._id}`}>
+      <Link to={productLink}>
         <img src={product.image || "default-image-path.jpg"} alt={product.title} />
       </Link>
 
@@ -17,8 +20,8 @@ function ProductCard({ product }) {
         </div>
         <div className="card-item-price">
           <b className="card-item-price-new">{product.price} VND</b>
-          <br/>
-          <del className="card-item-price-old">{product.price}</del>   VND
+          <br />
+          <del className="card-item-price-old">{product.price}</del> VND
           <span className="discount-on-card">(20 % off)</span>
         </div>
         <div className="card-button">

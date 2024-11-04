@@ -96,9 +96,13 @@ function ProductPage() {
       prev === 0 ? product.image.length - 1 : prev - 1
     );
 
-  const relatedBooks = allBook.filter((b) =>
-    product.categoryId.some((catId) => b.categoryId.includes(catId))
-  );
+    const relatedBooks = product && product.categoryId && product.categoryId.length > 0
+    ? allBook.filter((b) => {
+        console.log('Product category IDs:', product.categoryId);
+        console.log('Book categories:', b.category);
+        return b.category.some((cat) => product.categoryId.includes(cat._id));
+      })
+    : [];
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -167,7 +171,7 @@ function ProductPage() {
     }
   };
 
-  console.log(reviews);
+  console.log(allBook);
 
   return (
     <div className="product-page-container container mt-5">

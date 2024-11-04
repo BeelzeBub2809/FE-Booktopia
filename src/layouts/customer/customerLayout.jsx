@@ -10,6 +10,7 @@ import {
 import LoginAndRegister from '../../components/features/customer/Auth/loginAndRegister.jsx';
 import OrderCustomer from '../../components/features/customer/Order/orders.jsx';
 import PrivateRoute from '../../components/common/auth/privateRoute/privateRoute.jsx';
+import { ComboProductPage } from '../../components/features/customer/ComboProductPage/ComboProductPage.jsx';
 
 const CustomerLayout = () => {
   return (
@@ -19,6 +20,7 @@ const CustomerLayout = () => {
         <Route path="/" exact element={<Home />} />
         <Route path="/shop" exact element={<Shop />} />
         <Route path="/shop/:id" element={<ProductPage />} />
+        <Route path="/shop/combo/:id" element={<ComboProductPage/>} />
         <Route path="/wishlist" element={<PrivateRoute element={<Wishlist />} allowedRoles={['customer']} />} />
         <Route path="/cart" element={<PrivateRoute element={<Cart />} allowedRoles={['customer']} />} />
         <Route path="/login-res" element={<LoginAndRegister />} />

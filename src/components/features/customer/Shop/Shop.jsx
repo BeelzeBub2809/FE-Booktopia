@@ -48,17 +48,34 @@ function Shop() {
     };
 
     const filteredProducts = products
-        .filter(product => {
-            const inSelectedGenres = selectedGenres.length === 0 || product.categoryId.some(id => selectedGenres.includes(id));
-            const inPriceRange = product.price >= minPrice && product.price <= maxPrice;
-            return inSelectedGenres && inPriceRange;
-        })
-        .sort((a, b) => {
-            if (sortOrder === "price-low-to-high") return a.price - b.price;
-            if (sortOrder === "price-high-to-low") return b.price - a.price;
-            if (sortOrder === "top-sellers") return b.sold - a.sold; // Sort by sold descending
-            return 0; // Default, no sorting
-        });
+    .filter(product => {
+      let inSelectedGenres = true;
+  
+      if (selectedGenres.length > 0) {
+        if (product.type === "single" && product.category) {
+          // Check if single product matches selected genres
+          inSelectedGenres = product.category.some(cat => selectedGenres.includes(cat._id));
+        } else if (product.type === "combo" && product.products) {
+          // Check if any product in the combo matches selected genres
+          inSelectedGenres = product.products.some(p =>
+            p.category && p.category.some(cat => selectedGenres.includes(cat._id))
+          );
+        }
+      }
+  
+      const inPriceRange = product.price >= minPrice && product.price <= maxPrice;
+      return inSelectedGenres && inPriceRange;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "price-low-to-high") return a.price - b.price;
+      if (sortOrder === "price-high-to-low") return b.price - a.price;
+      if (sortOrder === "top-sellers") return b.sold - a.sold;
+      return 0;
+    });
+  
+  
+console.log(filteredProducts);
+        
 
     return (
         <div className='shop-container'>
