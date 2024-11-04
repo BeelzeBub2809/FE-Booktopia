@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './discountSale.css';
 import { DataTable } from 'simple-datatables';
-// import AddCategoryModal from './Modal/addCategoryModal';
-// import EditCategoryModal from './Modal/editCategoryModal';
+import AddDiscountModal from './Modal/addDiscountModal';
+import EditDiscountModal from './Modal/editDiscountModal';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
 import Lottie from "react-lottie";
 import Swal from 'sweetalert2';
-
+export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 function DiscountSale() {
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -28,6 +28,7 @@ function DiscountSale() {
     fetch("http://localhost:9999/api/discount")
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         setData(data.data);
         setLoading(false);
       })
@@ -74,7 +75,10 @@ function DiscountSale() {
     }
   }, [data, loading]);
 
-
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   const openAddModal = () => {
     setShowAddModal(true);
@@ -99,30 +103,46 @@ function DiscountSale() {
           <div className="col-lg-12">
             <div className="card">
               <div className="card-body">
-                <button className="btn btn-primary mb-3" onClick={openAddModal}>Add Category</button>
+                <button className="btn btn-primary mb-3" onClick={openAddModal}>Add Discount</button>
                 {loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
                 ) : (
                   <table className="table datatable">
                     <thead>
                       <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Actions</th>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Discount</th>
+                        <th>Min Order Price</th>
+                        <th>Max Order Price</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {
-                        data?.map((p, index) => (
-                          <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{p.name}</td>
-                            <td>
+                    {
+                      data?.map((p, index) => (
+                        <tr key={index}>
+                          <td> 
+                            {p.productId.image && p.productId.image.length > 0 ? (
+                              <img src={p.productId.image[0]} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                            ) : (
+                              <img src={IMAGE_DEFAULT} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                            )}
+                          </td>
+                          <td>{p.productId.name}</td>
+                          <td>{p.discount.$numberDecimal}</td>
+                          <td>{p.minOrderPrice.$numberDecimal}</td>
+                          <td>{p.maxOrderPrice.$numberDecimal}</td>
+                          <td>{formatDate(p.startDate)}</td>
+                          <td>{formatDate(p.endDate)}</td>
+                          <td>
                               <button className="btn btn-warning btn-sm me-2" onClick={() => { setSelectedItem(p); setShowEditModal(true) }}>Edit</button>
-                            </td>
-                          </tr>
-                        ))
-                      }
+                          </td>
+                        </tr>
+                      ))
+                    }
                     </tbody>
                   </table>
                 )}
@@ -131,8 +151,8 @@ function DiscountSale() {
           </div>
         </div>
       </section>
-      {/* <AddCategoryModal showModal={showAddModal} handleCloseModal={closeAddModal} />
-      <EditCategoryModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem} /> */}
+      <AddDiscountModal showModal={showAddModal} handleCloseModal={closeAddModal} />
+      <EditDiscountModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem} />
     </main>
   );
 }

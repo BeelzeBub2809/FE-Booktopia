@@ -1,8 +1,8 @@
 import { ROOT_DOMAIN } from "../../utils/config";
 
-const getCategory = async() => {
+const getDiscount = async() => {
     try {
-        let response = await fetch(`${ROOT_DOMAIN}/category`, {
+        let response = await fetch(`${ROOT_DOMAIN}/discount`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,10 +20,10 @@ const getCategory = async() => {
     }
 }
 
-const createCategory = async (data) => {
+const createDiscount = async (data) => {
   try {
    
-      let response = await fetch(`${ROOT_DOMAIN}/category`, {
+      let response = await fetch(`${ROOT_DOMAIN}/discount`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -42,9 +42,9 @@ const createCategory = async (data) => {
   }
 }
 
-const updateCategory = async (data) => {
+const updateDiscount = async (data) => {
     try {
-        let response = await fetch(`${ROOT_DOMAIN}/category/${data._id}`, {
+        let response = await fetch(`${ROOT_DOMAIN}/discount/${data._id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const updateCategory = async (data) => {
     }
 }
 
-const CategoryService = {
-    getCategory, createCategory, updateCategory
+const DiscountService = {
+    getDiscount, createDiscount, updateDiscount
 };
-export default CategoryService;
+export default DiscountService;
