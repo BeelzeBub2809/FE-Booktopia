@@ -167,7 +167,7 @@ class ProductReview extends Component {
                                     : 'btn-danger'
                                 }`}
                               >
-                                {review.status === 'active' ? 'Deactivate' : 'Activate'}
+                                {review.status === 'active' ? 'Inactivate' : 'Activate'}
                               </button>
                             </td>
                           </tr>

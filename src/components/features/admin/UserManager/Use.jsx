@@ -5,6 +5,7 @@ import EditUserModal from './Model/EditUser';
 import AddUserModal from './Model/AddUser';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json';
 import Lottie from 'react-lottie';
+import Swal from 'sweetalert2';
 
 function UserInfo() {
   const [data, setData] = useState([]);
@@ -14,6 +15,7 @@ function UserInfo() {
   const [selectedUser, setSelectedUser] = useState(null);
   const tableRef = useRef(null);
   const datatableRef = useRef(null);
+  const isDataTableInitialized = useRef(false);
 
   const loadingObj = {
     loop: true,
@@ -45,8 +47,9 @@ function UserInfo() {
 
   const toggleUserStatus = async (userId, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+
     try {
-      await fetch(`http://localhost:9999/api/user/${userId}`, {
+      const response = await fetch(`http://localhost:9999/api/user/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -54,64 +57,91 @@ function UserInfo() {
         credentials: 'include',
         body: JSON.stringify({ status: newStatus }),
       });
-      setData((prevData) =>
-        prevData.map((user) =>
+
+      if (!response.ok) {
+        throw new Error('Failed to update user status');
+      }
+
+      setData(prevData =>
+        prevData.map(user =>
           user._id === userId ? { ...user, status: newStatus } : user
         )
       );
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: `User status changed to ${newStatus}`,
+      });
+
     } catch (error) {
       console.error('Error updating user status:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to change user status.',
+      });
     }
+  };
+
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
   };
 
   useEffect(() => {
     fetchUsers();
+    
+    return () => {
+      if (datatableRef.current) {
+        datatableRef.current.destroy();
+      }
+    };
   }, []);
 
   useEffect(() => {
     if (data.length > 0 && !loading) {
-      if (datatableRef.current) {
-        datatableRef.current.destroy(); // Clean up the previous instance
-      }
-
-      const datatable = new DataTable(tableRef.current, {
-        perPageSelect: [10, 15, ["All", -1]],
-        searchable: true,
-        paging: true,
-        perPage: 10,
-        columns: [
-          { select: 0, sortSequence: ["desc", "asc"] },
-          { select: 1, sortSequence: ["desc"] },
-          { select: 4, cellClass: "green", headerClass: "red" }
-        ]
-      });
-
-      datatableRef.current = datatable; // Store the instance
-
-      tableRef.current.addEventListener('click', (event) => {
-        const target = event.target;
-        const row = target.closest('tr');
-        const rowIndex = row ? row.getAttribute('data-index') : null;
-        const selectedUser = data[rowIndex];
-
-        if (target.classList.contains('btn-warning')) {
-          setSelectedUser(selectedUser);
-          setShowEditModal(true);
-        } else if (target.classList.contains('btn-success') || target.classList.contains('btn-danger')) {
-          toggleUserStatus(selectedUser._id, selectedUser.status);
+      if (!isDataTableInitialized.current) {
+        if (datatableRef.current) {
+          datatableRef.current.destroy();
         }
-      });
-    }
 
-    return () => {
-      if (datatableRef.current) {
-        datatableRef.current.destroy(); // Cleanup on component unmount
+        datatableRef.current = new DataTable(tableRef.current, {
+          perPageSelect: [10, 15, ['All', -1]],
+          searchable: true,
+          paging: true,
+          perPage: 10,
+        });
+
+        // Add click event listener
+        tableRef.current.addEventListener('click', (event) => {
+          const target = event.target;
+          const row = target.closest('tr');
+          if (!row) return;
+          
+          const userId = row.getAttribute('data-user-id');
+          const user = data.find(u => u._id === userId);
+          
+          if (!user) return;
+
+          // Handle Edit button click
+          if (target.classList.contains('btn-warning')) {
+            handleEdit(user);
+          }
+          // Handle Status button click
+          else if (target.classList.contains('btn-success') || target.classList.contains('btn-danger')) {
+            toggleUserStatus(userId, user.status);
+          }
+        });
+
+        isDataTableInitialized.current = true;
       }
-    };
+    }
   }, [data, loading]);
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
+    setSelectedUser(null);
   };
 
   const openAddUserModal = () => {
@@ -152,7 +182,7 @@ function UserInfo() {
                     </thead>
                     <tbody>
                       {data.map((user) => (
-                        <tr key={user._id}>
+                        <tr key={user._id} data-user-id={user._id}>
                           <td>{user.userName}</td>
                           <td>{user.fullName}</td>
                           <td>{user.DOB ? new Date(user.DOB).toLocaleDateString() : 'N/A'}</td>
@@ -166,7 +196,6 @@ function UserInfo() {
                               className={`btn ${
                                 user.status === 'active' ? 'btn-success' : 'btn-danger'
                               }`}
-                              onClick={() => toggleUserStatus(user._id, user.status)}
                             >
                               {user.status}
                             </button>
@@ -182,7 +211,13 @@ function UserInfo() {
         </div>
       </section>
       <AddUserModal showModal={isAddUserModalOpen} handleCloseModal={closeAddUserModal} />
-      <EditUserModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} user={selectedUser}/>
+      {showEditModal && (
+        <EditUserModal 
+          showModal={showEditModal} 
+          handleCloseModal={handleCloseEditModal} 
+          user={selectedUser}
+        />
+      )}
     </main>
   );
 }

@@ -78,9 +78,6 @@ function Shop() {
       return 0;
     });
   
-  
-
-        
 
     return (
         <div className='shop-container'>
@@ -88,7 +85,7 @@ function Shop() {
                 genres={genres} 
                 onGenreChange={handleGenreChange} 
                 onPriceChange={handlePriceChange} 
-                onSortChange={handleSortChange} // Pass onSortChange here
+                onSortChange={handleSortChange} 
             />
             <div className='products-container'>
                 <h2 className='total-product'>Showing {filteredProducts.length} products</h2>
