@@ -98,8 +98,6 @@ function ProductPage() {
 
     const relatedBooks = product && product.categoryId && product.categoryId.length > 0
     ? allBook.filter((b) => {
-        console.log('Product category IDs:', product.categoryId);
-        console.log('Book categories:', b.category);
         return b.category.some((cat) => product.categoryId.includes(cat._id));
       })
     : [];
@@ -170,8 +168,6 @@ function ProductPage() {
       });
     }
   };
-
-  console.log(allBook);
 
   return (
     <div className="product-page-container container mt-5">

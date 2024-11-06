@@ -7,7 +7,7 @@ function Shop() {
     const [genres, setGenres] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(250000);
+    const [maxPrice, setMaxPrice] = useState(50000000);
     const [sortOrder, setSortOrder] = useState("price-low-to-high"); 
 
     useEffect(() => {

@@ -171,6 +171,7 @@ function ComboProductPage() {
     }
   };
 
+console.log(combo);
 
   return (
     <div className="product-page-container container mt-5">

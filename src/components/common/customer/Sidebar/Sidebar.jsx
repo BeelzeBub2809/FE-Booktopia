@@ -3,7 +3,7 @@ import "./Sidebar.css";
 
 function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
     const [minPriceRange, setMinPriceRange] = useState(0);
-    const [maxPriceRange, setMaxPriceRange] = useState(250000);
+    const [maxPriceRange, setMaxPriceRange] = useState(5000000);
 
     const handleMinPriceChange = (value) => {
         setMinPriceRange(value);
@@ -35,7 +35,7 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
                             type="number"
                             className="input-min"
                             value={minPriceRange}
-                            max="10000"
+                            max="100000"
                         />
                     </div>
                     <div className="separator">-</div>
@@ -46,7 +46,7 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
                             type="number"
                             className="input-max"
                             value={maxPriceRange}
-                            max="10000"
+                            max="5000000"
                         />
                     </div>
                 </div>
@@ -54,8 +54,8 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
                     <div
                         className="progress"
                         style={{
-                            left: (minPriceRange / 250000) * 100 + "%",
-                            right: 100 - (maxPriceRange / 250000) * 100 + "%",
+                            left: (minPriceRange / 500000) * 100 + "%",
+                            right: 100 - (maxPriceRange / 5000000) * 100 + "%",
                         }}
                     ></div>
                 </div>
@@ -74,7 +74,7 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
                         type="range"
                         className="range-max"
                         min="0"
-                        max="250000"
+                        max="5000000"
                         value={maxPriceRange}
                         step="500"
                     />
