@@ -8,7 +8,7 @@ function Shop() {
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(250000);
-    const [sortOrder, setSortOrder] = useState("price-low-to-high"); // New state for sorting
+    const [sortOrder, setSortOrder] = useState("price-low-to-high"); 
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,6 +49,11 @@ function Shop() {
 
     const filteredProducts = products
     .filter(product => {
+      // Check if the product has status "active"
+      if (product.status !== "active") {
+        return false; // Exclude products that are not active
+      }
+  
       let inSelectedGenres = true;
   
       if (selectedGenres.length > 0) {
@@ -57,8 +62,8 @@ function Shop() {
           inSelectedGenres = product.category.some(cat => selectedGenres.includes(cat._id));
         } else if (product.type === "combo" && product.products) {
           // Check if any product in the combo matches selected genres
-          inSelectedGenres = product.products.some(p =>
-            p.category && p.category.some(cat => selectedGenres.includes(cat._id))
+          inSelectedGenres = product.products.some(
+            p => p.category && p.category.some(cat => selectedGenres.includes(cat._id))
           );
         }
       }
@@ -74,7 +79,7 @@ function Shop() {
     });
   
   
-console.log(filteredProducts);
+
         
 
     return (

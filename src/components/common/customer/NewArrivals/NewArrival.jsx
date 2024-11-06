@@ -22,10 +22,14 @@ function NewArrivals() {
     fetch("http://localhost:9999/api/product")
       .then(response => response.json())
       .then(data => {
-        const sortedProducts = data.data.sort(
+        // Filter to include only products with status "active"
+        const activeProducts = data.data.filter(product => product.status === "active");
+        // Sort products by newest first
+        const sortedProducts = activeProducts.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        ); // Sort products by newest first
-        setProducts(sortedProducts.slice(0, 4)); // Take only the 4 most recent products
+        );
+        // Take only the 4 most recent products
+        setProducts(sortedProducts.slice(0, 4));
         setLoading(false); // Set loading to false after data is fetched
       })
       .catch(error => {
@@ -33,6 +37,7 @@ function NewArrivals() {
         setLoading(false); // Stop loading even if there's an error
       });
   }, []);
+  
 
   return (
     <div className="new-arrivals-container">
