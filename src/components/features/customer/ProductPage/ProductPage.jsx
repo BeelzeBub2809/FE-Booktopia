@@ -14,13 +14,11 @@ function ProductPage() {
   const [allBook, setAllBook] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(0); // State for reviews
+  const [rating, setRating] = useState(0);
 
-  // Combined fetch for product, related books, and reviews
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        // Fetch product data
         const productResponse = await fetch(
           `http://localhost:9999/api/product/${id}`
         );
@@ -29,7 +27,6 @@ function ProductPage() {
         const productData = await productResponse.json();
         setProduct(productData.data);
 
-        // Fetch all products for related books
         const allProductsResponse = await fetch(
           "http://localhost:9999/api/product"
         );
@@ -38,8 +35,7 @@ function ProductPage() {
         const allProductsData = await allProductsResponse.json();
         setAllBook(allProductsData.data);
 
-        // Fetch reviews for the product
-        await fetchReviews(); // Fetch reviews initially
+        await fetchReviews();
       } catch (err) {
         setError(err.message);
       } finally {
@@ -55,11 +51,12 @@ function ProductPage() {
       const reviewResponse = await fetch(
         `http://localhost:9999/api/review/book/${id}`
       );
-      if (!reviewResponse.ok) throw new Error("Failed to fetch product reviews.");
+      if (!reviewResponse.ok)
+        throw new Error("Failed to fetch product reviews.");
       const reviewData = await reviewResponse.json();
-
-      // Filter reviews to only include those with status "active"
-      const activeReviews = reviewData.data.filter(review => review.status === "active");
+      const activeReviews = reviewData.data.filter(
+        (review) => review.status === "active"
+      );
       setReviews(activeReviews);
     } catch (err) {
       setError(err.message);
@@ -96,11 +93,17 @@ function ProductPage() {
       prev === 0 ? product.image.length - 1 : prev - 1
     );
 
-    const relatedBooks = product && product.categoryId && product.categoryId.length > 0
-    ? allBook.filter((b) => {
-        return b.category.some((cat) => product.categoryId.includes(cat._id));
-      })
-    : [];
+    const relatedBooks =
+    product && product.category && product.category.length > 0
+      ? allBook.filter((b) =>
+          b.category.some((cat) =>
+            product.category.map((pCat) => pCat._id).includes(cat._id)
+          )
+        )
+      : [];
+  
+
+  console.log(allBook);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -120,10 +123,7 @@ function ProductPage() {
       });
 
       if (!res.ok) throw new Error("You have already reviewed this product.");
-      // Fetch the updated reviews after submitting the new review
-      await fetchReviews(); // Call the function to fetch reviews
-
-      // Reset comment and rating state
+      await fetchReviews();
       setComment("");
       setRating(0);
 
@@ -142,17 +142,16 @@ function ProductPage() {
       });
     }
   };
+
   const handleDeleteReview = async (reviewId) => {
     try {
       const res = await fetch(`http://localhost:9999/api/review/${reviewId}`, {
         method: "DELETE",
       });
-  
+
       if (!res.ok) throw new Error("Failed to delete the review.");
-      
-      // Fetch updated reviews after deletion
-      await fetchReviews(); // Call the function to fetch reviews again
-  
+      await fetchReviews();
+
       Swal.fire({
         title: "Success",
         text: "Review deleted successfully",
@@ -169,10 +168,14 @@ function ProductPage() {
     }
   };
 
+  const hasDiscount = product.discount > 0;
+  const discountedPrice = hasDiscount
+    ? product.price - (product.price * product.discount) / 100
+    : product.price;
+
   return (
     <div className="product-page-container container mt-5">
       <div className="product-page-item">
-        {/* Image Section */}
         <div className="product-image-section">
           <div className="main-image-container">
             <img
@@ -212,23 +215,32 @@ function ProductPage() {
           </div>
         </div>
 
-        {/* Product Details Section */}
         <div className="product-details-section">
           <h2 className="product-name">{product.name}</h2>
           <hr />
           <p className="product-author">
-            <b>Author: </b> {product.author}
+            <b>Author: </b> {product.author.join(", ")}
           </p>
           <p className="product-description">
-            <b>Description: </b> This is a description test
+            <b>Description: </b> {product.description}
           </p>
           <p className="product-rating">
             <b>Rating: </b> 5
           </p>
           <h3 className="product-price">
-            <b className="product-price-new">{product.price} VND</b>
-            <del className="product-price-old">{product.price}</del> VND
-            <span className="product-discount">(20% off)</span>
+            {hasDiscount ? (
+              <>
+                <b className="product-price-new">
+                  {discountedPrice.toFixed(0)} VND
+                </b>
+                <del className="product-price-old">{product.price} VND</del>
+                <span className="product-discount">
+                  ({product.discount}% off)
+                </span>
+              </>
+            ) : (
+              <b className="product-price-new">{product.price} VND</b>
+            )}
           </h3>
           <div className="product-action-buttons">
             <button className="btn btn-primary">Add to wishlist</button>
@@ -242,35 +254,34 @@ function ProductPage() {
         </div>
       </div>
 
-      {/* Reviews Section */}
       <div className="container mt-5">
         <h3>Product Reviews</h3>
         <div className="review-list p-3">
-        {reviews.length > 0 ? (
-          reviews.map((review) => (
-            <div key={review._id} className="review-item">
-              <div className="review-header">
-                <strong>{review.customerId.userId.userName}</strong>
-                <span className="rating">{"⭐".repeat(review.rating)}</span>
-                {/* Check if the review belongs to the current user */}
-                {review.customerId.userId._id === localStorage.getItem("userId").replace(/"/g, '') && (
-                  <button
-                  className="btn btn-danger btn-sm ms-2 float-end"
-                  onClick={() => handleDeleteReview(review._id)}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </button>
-                
-                )}
+          {reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review._id} className="review-item">
+                <div className="review-header">
+                  <strong>{review.customerId.userId.userName}</strong>
+                  <span className="rating">
+                    {"⭐".repeat(review.rating)}
+                  </span>
+                  {review.customerId.userId._id ===
+                    localStorage.getItem("userId").replace(/"/g, "") && (
+                    <button
+                      className="btn btn-danger btn-sm ms-2 float-end"
+                      onClick={() => handleDeleteReview(review._id)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  )}
+                </div>
+                <p>{review.content}</p>
               </div>
-              <p>{review.content}</p>
-            </div>
-          ))
-        ) : (
-          <p>No reviews available</p>
-        )}
-      </div>
-      
+            ))
+          ) : (
+            <p>No reviews available</p>
+          )}
+        </div>
 
         <h4>Write a Review</h4>
         <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
@@ -313,31 +324,33 @@ function ProductPage() {
         </form>
       </div>
 
-      {/* Related Books Section */}
       <div className="related-books-section">
-        <h3>Related Books</h3>
-        <div className="related-books-list">
-          {relatedBooks.length > 0 ? (
-            relatedBooks.map((book, index) => (
-              <div key={index} className="related-book-card">
-                <Link to={`/shop/${book._id}`}>
-                  <img
-                    className="related-book-image"
-                    src={book.image || bookCover}
-                    alt={book.name}
-                  />
-                </Link>
-                <h4>{book.name}</h4>
-                <p>by {book.author}</p>
-              </div>
-            ))
-          ) : (
-            <p>No related books found</p>
-          )}
-        </div>
+      <h3>Related Books</h3>
+      <div className="related-books-list">
+        {relatedBooks.length > 0 ? (
+          relatedBooks.map((book, index) => (
+            <div key={index} className="related-book-card">
+              <Link
+                to={book.type === "combo" ? `/shop/combo/${book._id}` : `/shop/${book._id}`}
+              >
+                <img
+                  className="related-book-image"
+                  src={book.image || bookCover}
+                  alt={book.name}
+                />
+              </Link>
+              <h4>{book.name}</h4>
+              <p>by {book.author}</p>
+            </div>
+          ))
+        ) : (
+          <p>No related books found</p>
+        )}
       </div>
+    </div>
+    
     </div>
   );
 }
 
-export {ProductPage};
+export { ProductPage };

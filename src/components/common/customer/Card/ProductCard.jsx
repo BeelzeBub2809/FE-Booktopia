@@ -3,15 +3,24 @@ import "./ProductCard.css";
 import { Link } from "react-router-dom";
 
 function ProductCard({ product }) {
-  // Xác định đường dẫn dựa trên type của product
+  // Define the link based on the product type
   const productLink = product.type === 'combo'
     ? `/shop/combo/${product._id}`
     : `/shop/${product._id}`;
 
+  // Calculate the discounted price if a discount exists
+  const hasDiscount = product.discount > 0;
+  const discountedPrice = hasDiscount
+    ? product.price - (product.price * product.discount / 100)
+    : product.price;
+
   return (
     <div className="card-basic">
       <Link to={productLink}>
-        <img src={product.image || "default-image-path.jpg"} alt={product.title} />
+        <img
+          src={product.image ? product.image[0] : "default-image-path.jpg"}
+          alt={product.name}
+        />
       </Link>
 
       <div className="card-item-details">
@@ -19,16 +28,19 @@ function ProductCard({ product }) {
           <h4>{product.name}</h4>
         </div>
         <div className="card-item-price">
-          <b className="card-item-price-new">{product.price} VND</b>
-          <br />
-          <del className="card-item-price-old">{product.price}</del> VND
-          <span className="discount-on-card">(20 % off)</span>
+          {/* Render the discounted price and original price conditionally */}
+          {hasDiscount ? (
+            <>
+              <b className="card-item-price-new">{discountedPrice.toFixed(0)} VND</b>
+              <br />
+              <del className="card-item-price-old">{product.price} VND</del>
+              <span className="discount-on-card">({product.discount}% off)</span>
+            </>
+          ) : (
+            <b className="card-item-price-new">{product.price} VND</b>
+          )}
         </div>
-        <div className="card-button">
-          <button className="card-icon-btn add-to-wishlist-btn outline-card-secondary-btn">
-            <i className="fa fa-heart-o" aria-hidden="true"></i>
-          </button>
-        </div>
+
       </div>
     </div>
   );

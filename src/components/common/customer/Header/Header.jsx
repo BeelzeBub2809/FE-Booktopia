@@ -16,7 +16,7 @@ function Header() {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    const id = userId ? userId.replace(/"/g, '') : null;
+    const id = userId ? userId.replace(/"/g, "") : null;
     if (userId) {
       setIsLoggedIn(true);
       fetchUserData(id);
@@ -28,7 +28,7 @@ function Header() {
   const fetchUserData = async (id) => {
     try {
       const response = await fetch(`http://localhost:9999/api/user/${id}`);
-      const result = await response.json();      
+      const result = await response.json();
       if (result.status === "success") {
         setUser(result.data);
       } else {
@@ -82,7 +82,6 @@ function Header() {
     navigation("/login-res");
   };
 
-
   return (
     <div className="top-bar">
       <div className="left-topbar-container">
@@ -102,7 +101,11 @@ function Header() {
               <div className="search-results2">
                 {searchResults.map((item) => (
                   <Link
-                    to={`/shop/${item._id}`}
+                    to={
+                      item.type === "single"
+                        ? `/shop/${item._id}`
+                        : `/shop/combo/${item._id}`
+                    }
                     key={item._id}
                     className="search-result-item"
                     onClick={() => {
@@ -120,11 +123,21 @@ function Header() {
                     <div className="search-result-content">
                       <h3 className="search-result-title">{item.name}</h3>
                       <div className="search-result-price">
-                        <span className="current-price">
-                          {item.price.toLocaleString()}đ
-                        </span>
-                        {item.price.toLocaleString() && (
-                          <span className="original-price">
+                        {item.discount ? (
+                          <>
+                            <span className="current-price">
+                              {(
+                                item.price -
+                                item.price * (item.discount / 100)
+                              ).toLocaleString()}
+                              đ
+                            </span>
+                            <span className="original-price">
+                              {item.price.toLocaleString()}đ
+                            </span>
+                          </>
+                        ) : (
+                          <span className="current-price">
                             {item.price.toLocaleString()}đ
                           </span>
                         )}
@@ -162,14 +175,6 @@ function Header() {
           </button>
         </Link>
 
-        <Link to="/wishlist">
-          <button className="icon-btn">
-            <div className="icon-count-badge">
-              <i className="fa fa-heart-o" aria-hidden="true"></i>
-            </div>
-          </button>
-        </Link>
-
         <Link to="/cart">
           <button className="icon-btn">
             <div className="icon-count-badge">
@@ -186,12 +191,12 @@ function Header() {
           </button>
         </Link>
         {isLoggedIn && user && (
-        <button className="icon-btn" onClick={handleShowProfileModal}>
-          <div className="icon-count-badge">
-            <i className="fa-solid fa-user"></i>
-          </div>
-        </button>
-      )}
+          <button className="icon-btn" onClick={handleShowProfileModal}>
+            <div className="icon-count-badge">
+              <i className="fa-solid fa-user"></i>
+            </div>
+          </button>
+        )}
       </div>
       {isLoggedIn && user && (
         <UserProfileModal
@@ -200,7 +205,6 @@ function Header() {
           user={user}
         />
       )}
-      
     </div>
   );
 }
