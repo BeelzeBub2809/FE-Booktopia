@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
 
-function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
+function Sidebar({ authors, genres, onGenreChange, onPriceChange, onSortChange, onAuthorChange }) {
     const [minPriceRange, setMinPriceRange] = useState(0);
     const [maxPriceRange, setMaxPriceRange] = useState(5000000);
 
@@ -17,6 +17,10 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
 
     const handleSortOptionChange = (event) => {
         onSortChange(event.target.value); 
+    };
+
+    const handleAuthorChange = (author) => {
+        onAuthorChange(author);
     };
 
     return (
@@ -128,6 +132,21 @@ function Sidebar({ genres, onGenreChange, onPriceChange, onSortChange }) {
                     <label htmlFor="top-sellers">Top-Sellers</label>
                 </div>
             </div>
+
+            <div className="product-author">
+            <p>Author</p>
+            {authors.map((author, index) => (
+                <div className="checkbox-item" key={index}>
+                    <input
+                        id={`${author}-checkbox`} // Tạo id duy nhất cho mỗi checkbox
+                        type="checkbox"
+                        onChange={() => handleAuthorChange(author)} // Gọi hàm xử lý khi chọn tác giả
+                    />
+                    <label htmlFor={`${author}-checkbox`}>{author}</label> 
+                </div>
+            ))}
+        </div>
+        
         </aside>
     );
 }
