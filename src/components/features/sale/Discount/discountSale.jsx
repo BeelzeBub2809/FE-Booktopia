@@ -95,7 +95,7 @@ function DiscountSale() {
   return (
     <main id="main" className="main">
       <div className="pagetitle">
-        <h2>Manage Category</h2>
+        <h2>Manage Discount</h2>
       </div>
 
       <section className="section">
@@ -107,17 +107,17 @@ function DiscountSale() {
                 {loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
                 ) : (
-                  <table className="table datatable">
+                  <table className="table datatable text-center align-middle">
                     <thead>
                       <tr>
-                        <th>Image</th>
-                        <th>Product Name</th>
-                        <th>Discount</th>
-                        <th>Min Order Price</th>
-                        <th>Max Order Price</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Action</th>
+                        <th className='text-center align-middle'>Image</th>
+                        <th className='text-center align-middle'>Product Name</th>
+                        <th className='text-center align-middle'>Discount</th>
+                        <th className='text-center align-middle'>Min Order Price</th>
+                        <th className='text-center align-middle'>Max Order Price</th>
+                        <th className='text-center align-middle'>Start Date</th>
+                        <th className='text-center align-middle'>End Date</th>
+                        <th className='text-center align-middle'>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -132,9 +132,9 @@ function DiscountSale() {
                             )}
                           </td>
                           <td>{p.productId.name}</td>
-                          <td>{p.discount.$numberDecimal}</td>
-                          <td>{p.minOrderPrice.$numberDecimal}</td>
-                          <td>{p.maxOrderPrice.$numberDecimal}</td>
+                          <td>{p.discount}</td>
+                          <td>{p.minOrderPrice}</td>
+                          <td>{p.maxOrderPrice}</td>
                           <td>{formatDate(p.startDate)}</td>
                           <td>{formatDate(p.endDate)}</td>
                           <td>

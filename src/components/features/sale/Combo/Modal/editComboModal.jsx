@@ -5,6 +5,7 @@ import LoadingLottie from "../../../../../Assets/Lottie/loading-0.json";
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ComboService from '../../../../../services/combo/comboServices';
+import ProductService from '../../../../../services/product/productService';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 
 export default function EditComboModal({ showModal, handleCloseModal, item }) {
@@ -20,7 +21,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
       _id: '',
       name: '',
       price: 0,
-      discount: 100,
+      discount: null,
       quantity: 0,
       status: 'active',
       image: '',
@@ -46,22 +47,25 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
         console.error("Error fetching products:", error);
         setLoading(false);
       });
-
-      fetch("http://localhost:9999/api/product")
-        .then(response => response.json())
-        .then(data => {
-          setProducts(data.data);
+      
+      const fetchProducts = async () => {
+        try {
+          const data = {status: 'active'};
+          const res = await ProductService.getProductWithData(data);
+          setProducts(res.data);
           setLoading(false);
-        })
-      .catch(error => {
-        console.error("Error fetching products:", error);
-        setLoading(false);
-      });
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          setLoading(false);
+        }
+      };
+  
+      fetchProducts();
 
 			if(item){
 				setImagePreview(item.image[0]);
 				setImageList(item.image);
-				setSelectedItem({...item, price: parseFloat(item.price.$numberDecimal), discount: parseFloat(item.discount.$numberDecimal)});
+				setSelectedItem({...item, price: parseFloat(item.price), discount: parseFloat(item.discount)});
 				setSelectedProducts(products.filter(p => item.productId.includes(p._id)));
 			}
   }, [item]);
@@ -124,6 +128,14 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
 			}));
 	};
 
+  useEffect(() => {
+    const totalPrice = selectedProducts.reduce((sum, product) => sum + product.price, 0);
+    setSelectedItem(prevItem => ({
+      ...prevItem,
+      price: totalPrice
+    }));
+  }, [selectedProducts]);
+
 	const handleProductSelect = (product) => {
 		setSelectedProducts(prev => {
 			if (prev.some(p => p._id === product._id)) {
@@ -136,7 +148,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
 
 	const handleSubmit = async (e) => {
 	  try {
-	    const res = await ComboService.updateCombo(selectedItem);
+	    const res = await ComboService.updateCombo({...selectedItem, productId: selectedProducts.map(p => p._id)});
 	    Swal.fire({
 	      title: `successfully`,
 	      text: res.message,
@@ -249,21 +261,13 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price products: {selectedProducts.reduce((sum, product) => sum + product.price, 0)} VND</label>
-                        </div>
-
-                        <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price products with discount: {selectedProducts.reduce((sum, product) => sum + product.price, 0)} VND</label>
-                        </div>
-
-                        <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Quantity</label>
                             <input style={{ height: '38px' }} type="text" className="form-control" name="quantity" value={selectedItem.quantity} onChange={handleChange} />
                           </div>
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Price</label>
-                            <input style={{ height: '38px' }} type="text" className="form-control" name="price" value={selectedItem.price} onChange={handleChange} />
+                            <input disabled style={{ height: '38px' }} type="text" className="form-control" name="price" value={selectedProducts.reduce((sum, product) => sum + product.price, 0)}/>
                           </div>
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Discount</label>
@@ -272,7 +276,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price: {Math.ceil((selectedItem.price *  selectedItem.discount / 100) * 10) / 10} VND</label>
+                        <label>Total price: {selectedItem.discount && selectedItem.discount > 0 ? Math.ceil((selectedItem.price - selectedItem.price * selectedItem.discount / 100) * 10) / 10 : selectedItem.price} VND</label>
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
@@ -301,7 +305,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                               { 
                                 products && products.filter((p) => 
                                   p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
-                                    && (selectedCategoryId === '' || p.categoryId.includes(selectedCategoryId)))
+                                    && (selectedCategoryId === '' || p.categoryId.some(cate => cate._id == selectedCategoryId)))
                                   .map((p) => (
                                     <Button
                                       key={p._id}

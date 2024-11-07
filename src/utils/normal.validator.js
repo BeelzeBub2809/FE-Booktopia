@@ -8,6 +8,7 @@ const Validators = {
     phoneNumber: value => value && value.trim().length === 10  && /^0\d{9}$/.test(value) ? null : { phoneNumber: true},
     password: value => value && value.trim().length > 0 && /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value) ? null : { password: true },
     number: value => value && /^\d+(\.\d{1,2})?$/.test(value) ? null : { price: true },
+    isbn: value => value && /^(?=(?:[^0-9]*[0-9]){10}(?:(?:[^0-9]*[0-9]){3})?$)[\\d-]+$/.test(value) ? null : { isbn: true },
 };
 
 export default Validators;

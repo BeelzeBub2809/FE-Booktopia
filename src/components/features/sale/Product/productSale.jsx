@@ -6,11 +6,13 @@ import EditProductModal from './Modal/editProductModal';
 import LoadingLottie from '../../../../Assets/Lottie/loading-0.json'
 import Lottie from "react-lottie"; 
 import ProductService from '../../../../services/product/productService';
+import InputStockModal from './Modal/inputStockModal';
 import Swal from 'sweetalert2';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 function ProductSale() {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showInputStockModal, setShowInputStockModal] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -25,23 +27,19 @@ function ProductSale() {
   };
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = {status: 'active'};
+        const res = await ProductService.getProductWithData(data);
+        setData(res.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setLoading(false);
+      }
+    };
     setLoading(true);
-    fetch("http://localhost:9999/api/product", {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-      setData(data.data);
-      setLoading(false);
-    })
-    .catch(error => {
-      console.error("Error fetching products:", error);
-      setLoading(false);
-    });
+    fetchProducts();
   }, []);
   
   useEffect(() => {
@@ -75,6 +73,9 @@ function ProductSale() {
               setShowEditModal(true);
             } else if (target.classList.contains('btn-success') || target.classList.contains('btn-danger')) {
               handleChangeActive(selectedProduct._id, selectedProduct.status);
+            } else if (target.classList.contains('input-stock')) {
+              setSelectedItem(selectedProduct);
+              setShowInputStockModal(true);
             }
           });
         });
@@ -93,6 +94,10 @@ function ProductSale() {
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
+  }
+  
+  const handleCloseInputStockModal = () => {
+    setShowInputStockModal(false);
   }
 
   const handleChangeActive = async (id, status) => {
@@ -134,20 +139,20 @@ function ProductSale() {
                 { loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
                 ) : (
-                <table className="table datatable">
+                <table className="table datatable text-center align-middle">
                   <thead>
                     <tr>
-                      <th>Image</th>
-                      <th>ISBN</th>
-                      <th>Name</th>
-                      <th>Quantity In Stock</th>
-                      <th>Publisher</th>
-                      <th>Actions</th>
+                      <th className='text-center align-middle'>Image</th>
+                      <th className='text-center align-middle'>ISBN</th>
+                      <th className='text-center align-middle'>Name</th>
+                      <th className='text-center align-middle'>Quantity In Stock</th>
+                      <th className='text-center align-middle'>Publisher</th>
+                      <th className='text-center align-middle'>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                    {
-                    data?.map((p, index) => (
+                    data && data.map((p, index) => (
                         <tr key={p._id} data-index={index}> {/* Add data-index to track the row */}
                           <td>
                             {p.image && p.image.length > 0 ? (
@@ -160,7 +165,8 @@ function ProductSale() {
                           <td>{p.name}</td>
                           <td>{p.quantityInStock}</td>
                           <td>{p.publisher}</td>
-                          <td style={{width: '230px'}}>
+                          <td style={{minWidth: '300px'}}>
+                            <button className="btn btn-info me-2 input-stock">Input</button>
                             <button className="btn btn-warning me-2">Edit</button>
                             {
                               p.status === 'active' ? (
@@ -183,6 +189,7 @@ function ProductSale() {
       </section>
       <AddProductModal showModal={isAddProductModalOpen} handleCloseModal={closeAddProductModal}/>
       <EditProductModal showModal={showEditModal} handleCloseModal={handleCloseEditModal} item={selectedItem}/>
+      <InputStockModal showModal={showInputStockModal} handleCloseModal={handleCloseInputStockModal} item={selectedItem}/>
     </main>
   );
 }

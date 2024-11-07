@@ -125,7 +125,7 @@ function OrderSale() {
   return (
     <main id="main" className="main">
       <div className="pagetitle">
-        <h2>Order</h2>
+        <h2>Manage Order</h2>
       </div>
       <section className="section">
         <div className="row">

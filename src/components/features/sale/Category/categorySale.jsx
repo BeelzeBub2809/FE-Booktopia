@@ -103,7 +103,7 @@ function CategorySale() {
                 {loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
                 ) : (
-                  <table className="table datatable">
+                  <table className="table datatable text-center align-middle">
                     <thead>
                       <tr>
                         <th>No</th>
