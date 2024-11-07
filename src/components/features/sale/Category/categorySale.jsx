@@ -106,9 +106,9 @@ function CategorySale() {
                   <table className="table datatable text-center align-middle">
                     <thead>
                       <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Actions</th>
+                        <th className='text-center align-middle'>No</th>
+                        <th className='text-center align-middle'>Name</th>
+                        <th className='text-center align-middle'>Actions</th>
                       </tr>
                     </thead>
                     <tbody>

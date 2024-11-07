@@ -4,10 +4,10 @@ import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ProductService from '../../../../../services/product/productService';
 import CategoryService from '../../../../../services/product/categoryService';
-
+import { ValidatorsControl } from '../../../../../utils/validators-control';
+import { Rules } from '../../../../../utils/rules';
 export default function EditCategoryModal({ showModal, handleCloseModal, item }) {
   const [loading, setLoading] = useState(true); 
-  const [imagePreview, setImagePreview] = useState('https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg');
   const [selectedItem, setSelectedItem] = useState({
       name: '',
   });
@@ -26,45 +26,41 @@ export default function EditCategoryModal({ showModal, handleCloseModal, item })
     }
   }, [item]);
 
-    const handleImageChange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
     const handleChange = (e) => {
       setSelectedItem({...selectedItem, name: e.target.value});
     };
   
-    const handleSubmit = async () => {
-      try {
-        const res = await CategoryService.updateCategory(selectedItem);
-        Swal.fire({
-          title: `successfully`,
-          text: res.message,
-          icon: 'success',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          confirmButtonText: 'Ok',
-        }).then(() => {
-          handleCloseModal();
-        }).then(() => {
-          window.location.reload();
-        });
-      } catch (error) {
-        Swal.fire({
-          title: 'Error',
-          text: error.message,
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-          handleCloseModal();
-        });
+    const handleSubmit = async (e) => {
+      let formControl = new ValidatorsControl({
+        name: { value: selectedItem.name, validators: Rules.name},
+      })
+
+      let isSubmit = formControl.submitForm(e);
+      if(isSubmit) {
+        try {
+          const res = await CategoryService.updateCategory(selectedItem);
+          Swal.fire({
+            title: `successfully`,
+            text: res.message,
+            icon: 'success',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            confirmButtonText: 'Ok',
+          }).then(() => {
+            handleCloseModal();
+          }).then(() => {
+            window.location.reload();
+          });
+        } catch (error) {
+          Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            handleCloseModal();
+          });
+        }
       }
     };
 
@@ -74,25 +70,17 @@ export default function EditCategoryModal({ showModal, handleCloseModal, item })
         <>
           <div className="modal-backdrop fade show"></div>
           <div className="modal fade show" style={{ display: 'flex', width: '600px', minHeight: '120vh', background: 'none', alignItems: 'flex-end' }} tabIndex="-1" role='dialog'>
-            <div className="modal-dialog modal-lg modal-dialog-centered" role='document'>
-              <div className="modal-content">
+            <div className="modal-dialog modal-lg modal-dialog-centered" role='document' style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <div className="modal-content" style={{ width: '400px', height: '180px'}}>
                 <div className="modal-header">
-                  <h5 className="modal-title">Add Category</h5>
+                  <h5 className="modal-title">Edit Category</h5>
                 </div>
                 <div className="modal-body">
-                  <div className="d-flex" style={{ gap: '0px' }}>
-                    <div className='d-flex' style={{  flexDirection: 'column', alignItems: 'center' }}>
-                      <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
-                        <img src={imagePreview} alt="Product" className="avatar" style={{ width: '40%' }}  onChange={handleImageChange} />
-                        <div className="mt-3">
-                          <label className="form-label text-dark">Upload Image</label>
-                          <input type="file" className="form-control" accept="image/png, image/jpeg" />
-                        </div>
-                      </div>
-                      <div className="form-group mb-3  text-start text-dark" style={{ width: '50%', flexDirection: 'column', alignItems: 'center' }}>
-                        <label>Name</label>
-                        <input type="text" className="form-control" name="isbn" value={selectedItem.name} onChange={handleChange} />
-                      </div>
+                  <div className='d-flex' style={{  flexDirection: 'column', alignItems: 'center' }}>
+                    <div className="form-group mb-3  text-start text-dark" style={{ width: '100%', flexDirection: 'column', alignItems: 'center' }}>
+                      <label>Name</label>
+                      <input type="text" className="form-control" name="name" value={selectedItem.name} onChange={handleChange} />
+                      <div validation="name" className="error-message" style={{ color: 'red' }} alias="Category Name"></div>
                     </div>
                   </div>
                 </div>
