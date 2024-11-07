@@ -3,6 +3,8 @@ import LoadingLottie from "../../../../../Assets/Lottie/loading-0.json";
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ProductService from '../../../../../services/product/productService';
+import { ValidatorsControl } from '../../../../../utils/validators-control';
+import { Rules } from '../../../../../utils/rules';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 export default function EditProductModal({ showModal, handleCloseModal, item }) {
   const [loading, setLoading] = useState(true); 
@@ -140,29 +142,41 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
     };
 
     const handleSave = async (e) => {
-      try {
-        const res = await ProductService.updateProduct({...selectedItem, author: authors});
-        Swal.fire({
-          title: `successfully`,
-          text: res.message,
-          icon: 'success',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          confirmButtonText: 'Ok',
-        }).then(() => {
-          handleCloseModal();
-        }).then(() => {
-          window.location.reload();
-        });
-      } catch (error) {
-        Swal.fire({
-          title: 'Error',
-          text: error.message,
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-          handleCloseModal();
-        });
+      let formControl = new ValidatorsControl({
+        isbn: { value: selectedItem.isbn, validators: Rules.isbn },
+        name: { value: selectedItem.name, validators: Rules.name},
+        price: { value: selectedItem.price, validators: Rules.price },
+        publisher: { value: selectedItem.publisher, validators: Rules.name },
+        releaseDate: { value: selectedItem.releaseDate, validators: Rules.releaseDate },
+        description: { value: selectedItem.description, validators: Rules.description },
+      })
+      
+      let isSubmit = formControl.submitForm(e);
+      if(isSubmit) {
+        try {
+          const res = await ProductService.updateProduct({...selectedItem, author: authors});
+          Swal.fire({
+            title: `successfully`,
+            text: res.message,
+            icon: 'success',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            confirmButtonText: 'Ok',
+          }).then(() => {
+            handleCloseModal();
+          }).then(() => {
+            window.location.reload();
+          });
+        } catch (error) {
+          Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            handleCloseModal();
+          });
+        }
       }
     }
 
@@ -257,22 +271,21 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>ISBN</label>
                           <input type="text" className="form-control" name="isbn" value={selectedItem.isbn} onChange={handleChange} />
+                          <div validation="isbn" className="error-message" style={{ color: 'red' }} alias="Code ISBN"></div>
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Name</label>
                           <input type="text" className="form-control" name="name" value={selectedItem.name} onChange={handleChange} />
+                          <div validation="name" className="error-message" style={{ color: 'red' }} alias="Name product"></div>
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Price</label>
-                          <input type="number" className="form-control" name="price" value={selectedItem.price} onChange={handleChange} />
-                        </div>
-                        <div className="form-group mb-3 d-flex flex-column text-start text-dark">
-                          <label>Quantity In Stock</label>
-                          <input disabled type="number" className="form-control" name="quantityInStock" value={selectedItem.quantityInStock}/>
+                          <input type="number" className="form-control" name="price" value={selectedItem.price}/>
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Publisher</label>
                           <input type="text" className="form-control" name="publisher" value={selectedItem.publisher} onChange={handleChange} />
+                          <div validation="publisher" className="error-message" style={{ color: 'red' }} alias="Publisher"></div>
                         </div>
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Category</label>
@@ -295,6 +308,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Release date</label>
                           <input type="date" className="form-control" name="releaseDate" value={selectedItem.releaseDate} onChange={handleChange} />
+                          <div validation="releaseDate" className="error-message" style={{ color: 'red' }} alias="Release date"></div>
                         </div>
 
                       </form>
@@ -303,6 +317,7 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                           <label>Description</label>
                           <textarea className="form-control" name="description" value={selectedItem.description} onChange={handleChange} placeholder='Let input the fact of product'></textarea>
+                          <div validation="description" className="error-message" style={{ color: 'red' }} alias="Description"></div>
                       </div>
                       </div>
                   </div>

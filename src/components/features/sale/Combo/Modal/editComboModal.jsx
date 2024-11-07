@@ -6,6 +6,8 @@ import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ComboService from '../../../../../services/combo/comboServices';
 import ProductService from '../../../../../services/product/productService';
+import { ValidatorsControl } from '../../../../../utils/validators-control';
+import { Rules } from '../../../../../utils/rules';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 
 export default function EditComboModal({ showModal, handleCloseModal, item }) {
@@ -147,6 +149,24 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
 	};
 
 	const handleSubmit = async (e) => {
+    let formControl = new ValidatorsControl({
+      name: { value: selectedItem.name, validators: Rules.name},
+      quantity: { value: selectedItem.quantity, validators: Rules.number},
+      status: { value: selectedItem.status, validators: Rules.status},
+      discount: { value: selectedItem.discount, validators: Rules.discount},
+    })
+    let isSubmit = formControl.submitForm(e);
+    if(!isSubmit) return;
+    if (selectedProducts.length === 0) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Please select at least one product',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
 	  try {
 	    const res = await ComboService.updateCombo({...selectedItem, productId: selectedProducts.map(p => p._id)});
 	    Swal.fire({
@@ -241,6 +261,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                           <div className='d-flex flex-column col-7' style={{margin: '5px'}}>
                             <label>Name</label>
                             <input style={{ height: '38px' }} type="text" className="form-control" name="name" value={selectedItem.name} onChange={handleChange} />
+                            <div validation="name" className="error-message" style={{ color: 'red' }} alias="Combo Name"></div>
                           </div>
                           <div className='d-flex flex-column col-3' style={{margin: '5px'}}>
                             <label>Status</label>
@@ -253,6 +274,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                               styles={customStyles}
                               defaultValue={{ value: 'active', label: 'Active' }}
                               onChange={(selectedOption) => setSelectedItem(prevItem => ({ ...prevItem, status: selectedOption.value }))}/>
+                             <div validation="status" className="error-message" style={{ color: 'red' }} alias="Status"></div>
                           </div>
                         </div>
 
@@ -264,6 +286,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Quantity</label>
                             <input style={{ height: '38px' }} type="text" className="form-control" name="quantity" value={selectedItem.quantity} onChange={handleChange} />
+                            <div validation="quantity" className="error-message" style={{ color: 'red' }} alias="Quantity"></div>  
                           </div>
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Price</label>
@@ -272,6 +295,7 @@ export default function EditComboModal({ showModal, handleCloseModal, item }) {
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Discount</label>
                             <input style={{ height: '38px' }} type="text" className="form-control" name="discount" value={selectedItem.discount} onChange={handleChange} />
+                            <div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
                           </div>
                         </div>
 

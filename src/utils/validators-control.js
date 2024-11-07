@@ -35,7 +35,9 @@ export class ValidatorsControl{
         let msg = alias !== '' && alias != undefined ? message.replace(':field', alias) : message.replace(':field', field);
         if(validator[0] === 'maxLength' || validator[0] === 'minLength'){
             msg = msg.replace('{error}', validator[1].requiredLength);
-        }
+        } else if ( validator[0] === 'maxNumber' || validator[0] === 'minNumber'){
+            msg = msg.replace('{error}', validator[1]);
+        }  
         return msg;
     }
 

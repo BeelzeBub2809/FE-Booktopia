@@ -3,6 +3,8 @@ import LoadingLottie from "../../../../../Assets/Lottie/loading-0.json";
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ProductService from '../../../../../services/product/productService';
+import { ValidatorsControl } from '../../../../../utils/validators-control';
+import { Rules } from '../../../../../utils/rules';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 export default function AddProductModal({ showModal, handleCloseModal }) {
   const [imagePreview, setImagePreview] = useState(IMAGE_DEFAULT);
@@ -130,30 +132,42 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
     setItem({ ...item, [name]: value });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const res = await ProductService.createProduct({ ...item, author: authors });
-      Swal.fire({
-        title: `successfully`,
-        text: res.message,
-        icon: 'success',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        confirmButtonText: 'Ok',
-      }).then(() => {
-        handleCloseModal();
-      }).then(() => {
-        window.location.reload();
-      });
-    } catch (error) {
-      Swal.fire({
-        title: 'Error',
-        text: error.message,
-        icon: 'error',
-        confirmButtonText: 'Ok'
-      }).then(() => {
-        handleCloseModal();
-      });
+  const handleSubmit = async (e) => {
+    let formControl = new ValidatorsControl({
+      isbn: { value: item.isbn, validators: Rules.isbn },
+      name: { value: item.name, validators: Rules.name},
+      price: { value: item.price, validators: Rules.price },
+      publisher: { value: item.publisher, validators: Rules.name },
+      releaseDate: { value: item.releaseDate, validators: Rules.releaseDate },
+      description: { value: item.description, validators: Rules.description },
+    })
+    
+    let isSubmit = formControl.submitForm(e);
+    if(isSubmit) {
+      try {
+        const res = await ProductService.createProduct({ ...item, author: authors });
+        Swal.fire({
+          title: `successfully`,
+          text: res.message,
+          icon: 'success',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          handleCloseModal();
+        }).then(() => {
+          window.location.reload();
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          handleCloseModal();
+        });
+      }
     }
   };
 
@@ -248,22 +262,22 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>ISBN</label>
                         <input type="text" className="form-control" name="isbn" value={item.isbn} onChange={handleChange} />
+                        <div validation="isbn" className="error-message" style={{ color: 'red' }} alias="Code ISBN"></div>
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Name</label>
                         <input type="text" className="form-control" name="name" value={item.name} onChange={handleChange} />
+                        <div validation="name" className="error-message" style={{ color: 'red' }} alias="Name product"></div>
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Price</label>
                         <input type="number" className="form-control" name="price" value={item.price} onChange={handleChange} />
+                        <div validation="price" className="error-message" style={{ color: 'red' }} alias="Price product"></div>
                       </div>
-                      {/* <div className="form-group mb-3 d-flex flex-column text-start text-dark">
-                        <label>Quantity In Stock</label>
-                        <input type="number" className="form-control" name="quantityInStock" value={product.quantityInStock} onChange={handleChange} />
-                      </div> */}
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Publisher</label>
                         <input type="text" className="form-control" name="publisher" value={item.publisher} onChange={handleChange} />
+                        <div validation="publisher" className="error-message" style={{ color: 'red' }} alias="Publisher"></div>
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Category ID</label>
@@ -286,10 +300,12 @@ export default function AddProductModal({ showModal, handleCloseModal }) {
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Release date</label>
                         <input type="date" className="form-control" name="releaseDate" value={item.releaseDate} onChange={handleChange} />
+                        <div validation="releaseDate" className="error-message" style={{ color: 'red' }} alias="Release date"></div>
                       </div>
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark">
                         <label>Description</label>
                         <textarea className="form-control" name="description" value={item.description} onChange={handleChange} placeholder='Let input the fact of product'></textarea>
+                        <div validation="description" className="error-message" style={{ color: 'red' }} alias="Description"></div>
                       </div>
                     </form>
                   </div>

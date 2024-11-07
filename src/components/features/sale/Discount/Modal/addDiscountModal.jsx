@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 import Select from 'react-select';
 import DiscountService from '../../../../../services/product/discountService';
 import ProductService from '../../../../../services/product/productService';
+import { ValidatorsControl } from '../../../../../utils/validators-control';
+import { Rules } from '../../../../../utils/rules';
 export default function AddDiscountModal({ showModal, handleCloseModal }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -78,7 +80,43 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
     setItem({...item, [name]: value});
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    let formControl = new ValidatorsControl({
+      discount: { value: item.discount, validators: Rules.discount},
+      startDate: { value: item.startDate, validators: Rules.date},
+      endDate: { value: item.endDate, validators: Rules.date},
+      minOrderPrice: { value: item.minOrderPrice, validators: Rules.number},
+      maxOrderPrice: { value: item.maxOrderPrice, validators: Rules.number},
+    })
+    let isSubmit = formControl.submitForm(e);
+    if(!isSubmit) return;
+    if(selectedProduct === null) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Please select one product',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+    if(item.startDate > item.endDate) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Start date must be less than End date',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+    if(item.minOrderPrice > item.maxOrderPrice) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Min order price must be less than Max order price',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
     try {
       const res = await DiscountService.createDiscount(item);
       Swal.fire({
@@ -165,17 +203,20 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
                       <div className="form-group mb-3 d-flex flex-column text-start text-dark mt-4">
                         <label>Discount</label>
                         <input style={{ height: '38px'}} type="text" className="form-control" value={item.discount} name="discount" onChange={handleChange} />
+                        <div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
                       </div>
 
                       <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
                         <div className='d-flex flex-column' style={{margin: '5px'}}>
                           <label>Start Date</label>
                           <input style={{ height: '38px', width:'10vw'}} type="date" className="form-control" value={item.startDate} name="startDate" onChange={handleChange} />
+                          <div validation="startDate" className="error-message" style={{ color: 'red' }} alias="Start Date"></div>
                         </div>
 
                         <div className='d-flex flex-column' style={{margin: '5px'}}>
                           <label>End Date</label>
                           <input style={{ height: '38px', width:'10vw' }} type="date" className="form-control" value={item.endDate} name="endDate" onChange={handleChange} />
+                          <div validation="endDate" className="error-message" style={{ color: 'red' }} alias="End Date"></div>
                         </div>
                       </div>
 
@@ -183,10 +224,12 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
                         <div className='d-flex flex-column' style={{margin: '5px'}}>
                           <label>Min order price</label>
                           <input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={item.minOrderPrice} name="minOrderPrice" onChange={handleChange} />
+                          <div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Min order number"></div>
                         </div>
                         <div className='d-flex flex-column' style={{margin: '5px'}}>
                           <label>Max order price</label>
                           <input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={item.maxOrderPrice} name="maxOrderPrice" onChange={handleChange} />
+                          <div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Max order number"></div>
                         </div>
                       </div>
 
