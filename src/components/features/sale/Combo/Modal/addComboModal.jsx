@@ -5,6 +5,7 @@ import LoadingLottie from "../../../../../Assets/Lottie/loading-0.json";
 import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ComboService from '../../../../../services/combo/comboServices';
+import ProductService from '../../../../../services/product/productService';
 export const IMAGE_DEFAULT = 'https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg';
 export default function AddComboModal({ showModal, handleCloseModal }) {
     const [imagePreview, setImagePreview] = useState(IMAGE_DEFAULT);
@@ -18,7 +19,7 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
     const [item, setItem] = useState({
       name: '',
       price: 0,
-      discount: 100,
+      discount: null,
       quantity: 0,
       status: 'active',      
     });
@@ -44,17 +45,19 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
         setLoading(false);
       });
 
-      fetch("http://localhost:9999/api/product")
-        .then(response => response.json())
-        .then(data => {
-          setProducts(data.data);
+      const fetchProducts = async () => {
+        try {
+          const data = {status: 'active'};
+          const res = await ProductService.getProductWithData(data);
+          setProducts(res.data);
           setLoading(false);
-        })
-      .catch(error => {
-        console.error("Error fetching products:", error);
-        setLoading(false);
-      });
-
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          setLoading(false);
+        }
+      };
+  
+      fetchProducts();
     }, []);
     
     const handleSearchProduct = (e) => {
@@ -114,6 +117,14 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
 
       setItem({...item, [name]: value});
     };
+
+    useEffect(() => {
+      const totalPrice = selectedProducts.reduce((sum, product) => sum + product.price, 0);
+      setItem(prevItem => ({
+        ...prevItem,
+        price: totalPrice
+      }));
+    }, [selectedProducts]);
 
     const handleProductSelect = (product) => {
       setSelectedProducts(prev => {
@@ -238,21 +249,13 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price products: {selectedProducts.reduce((sum, product) => sum + product.price, 0)} VND</label>
-                        </div>
-
-                        <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price products with discount: {selectedProducts.reduce((sum, product) => sum + product.price, 0)} VND</label>
-                        </div>
-
-                        <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Quantity</label>
                             <input style={{ height: '38px' }} type="text" className="form-control" name="quantity" value={item.quantity} onChange={handleChange} />
                           </div>
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Price</label>
-                            <input style={{ height: '38px' }} type="text" className="form-control" name="price" value={item.price} onChange={handleChange} />
+                            <input disabled style={{ height: '38px' }} type="text" className="form-control" name="price" value={item.price} onChange={handleChange} />
                           </div>
                           <div className='d-flex flex-column' style={{margin: '5px'}}>
                             <label>Discount</label>
@@ -261,7 +264,7 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                          <label>Total price: {Math.ceil((item.price *  item.discount / 100) * 10) / 10} VND</label>
+                          <label>Total price: {item.discount && item.discount > 0 ? Math.ceil((item.price - item.price * item.discount / 100) * 10) / 10 : item.price} VND</label>
                         </div>
 
                         <div className="form-group mb-3 d-flex flex-column text-start text-dark">
@@ -289,8 +292,9 @@ export default function AddComboModal({ showModal, handleCloseModal }) {
                             <div className='d-flex flex-column' style={customProductStyles}>
                               { 
                                 products && products.filter((p) => 
+
                                   p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
-                                    && (selectedCategoryId === '' || p.categoryId.includes(selectedCategoryId)))
+                                    && (selectedCategoryId === '' || p.categoryId.some(cate => cate._id == selectedCategoryId)))
                                   .map((p) => (
                                     <Button
                                       key={p._id}

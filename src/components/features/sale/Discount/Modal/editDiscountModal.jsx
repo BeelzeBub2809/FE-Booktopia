@@ -5,6 +5,7 @@ import Lottie from "react-lottie"; // Lottie for animation
 import Swal from 'sweetalert2';
 import ComboService from '../../../../../services/combo/comboServices';
 import DiscountService from '../../../../../services/product/discountService';
+import ProductService from '../../../../../services/product/productService';
 import Select from 'react-select';
 export default function EditDiscountModal({ showModal, handleCloseModal, item }) {
 	const [products, setProducts] = useState([]);
@@ -34,6 +35,8 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
   };
 
   useEffect(() => {
+
+	setLoading(true);
     fetch("http://localhost:9999/api/category")
 			.then(response => response.json())
 			.then(data => {
@@ -44,22 +47,28 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 			console.error("Error fetching products:", error);
 			setLoading(false);
     });
-    fetch("http://localhost:9999/api/product")
-		.then(response => response.json())
-		.then(data => {
-			setProducts(data.data);
+
+	const fetchProducts = async () => {
+		try {
+			setLoading(true);
+			const data = {status: 'active'};
+			const res = await ProductService.getProductWithData(data);
+			setProducts(res.data);
 			setLoading(false);
-		})
-    .catch(error => {
+		} catch (error) {
 			console.error("Error fetching products:", error);
 			setLoading(false);
-    });
+		}
+	};
+	fetchProducts();
 
     if (item) {
+		console.log(item);
+		
 			setSelectedItem({...item, 
-				minOrderPrice: parseFloat(item.minOrderPrice.$numberDecimal), 
-				discount: parseFloat(item.discount.$numberDecimal),
-				maxOrderPrice: parseFloat(item.maxOrderPrice.$numberDecimal),
+				minOrderPrice: parseFloat(item.minOrderPrice), 
+				discount: parseFloat(item.discount),
+				maxOrderPrice: parseFloat(item.maxOrderPrice),
 				startDate: item.startDate ? new Date(item.startDate).toISOString().split('T')[0] : '',
 				endDate: item.endDate ? new Date(item.endDate).toISOString().split('T')[0] : ''
 			});
@@ -154,7 +163,7 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 														{ 
 															products && products.filter((p) => 
 																p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
-																	&& (selectedCategoryId === '' || p.categoryId.includes(selectedCategoryId)))
+																	&& (selectedCategoryId === '' ||  p.categoryId.some(cate => cate._id == selectedCategoryId)))
 																.map((p) => (
 																	<Button
 																		key={p._id}
@@ -171,11 +180,6 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 										</div>
 										
 										<form className="w-100">
-											<div className="form-group mb-3 d-flex flex-column text-start text-dark mt-4">
-												<label>Name</label>
-											<input disabled style={{ height: '38px'}} type="text" className="form-control" value={ selectedProduct !== null ? selectedProduct.name : ''} name="name" onChange={handleChange} />
-											</div>
-
 											<div className="form-group mb-3 d-flex flex-column text-start text-dark mt-4">
 												<label>Discount</label>
 												<input style={{ height: '38px'}} type="text" className="form-control" value={selectedItem.discount} name="discount" onChange={handleChange} />
@@ -241,6 +245,6 @@ export const customStyles = {
   };
   
   export const customProductStyles = {
-    maxHeight: '200px',
+    maxHeight: '250px',
     overflowY: 'auto', 
   };

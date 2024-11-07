@@ -48,7 +48,9 @@ export default function EditProductModal({ showModal, handleCloseModal, item }) 
       setAuthors(item.author);
       setImagePreview(item.image[0]);
       setImageList(item.image);
-      setSelectedItem({...item, releaseDate: item.releaseDate ? new Date(item.releaseDate).toISOString().split('T')[0] : ''});
+      setSelectedItem({...item, releaseDate: item.releaseDate ? new Date(item.releaseDate).toISOString().split('T')[0] : '',
+        categoryId: item.categoryId.map(c => c._id)
+      });
     }
   }, [item]);
 

@@ -132,15 +132,15 @@ function ComboSale() {
                 { loading ? (
                   <Lottie options={loadingObj} height={100} width={100} /> // Show Lottie animation while loading
                   ) : (
-                  <table className="table datatable">
+                  <table className="table datatable text-center align-middle">
                     <thead>
                       <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>discount</th>
-                        <th>Price</th>
-                        <th>Status</th>
+                        <th className='text-center align-middle'>Image</th>
+                        <th className='text-center align-middle'>Name</th>
+                        <th className='text-center align-middle'>Quantity</th>
+                        <th className='text-center align-middle'>discount</th>
+                        <th className='text-center align-middle'>Price</th>
+                        <th className='text-center align-middle'>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -156,8 +156,8 @@ function ComboSale() {
                             </td>
                             <td>{p.name}</td>
                             <td>{p.quantity}</td>
-                            <td>{p.discount.$numberDecimal}%</td>
-                            <td>{p.price.$numberDecimal} VND</td>
+                            <td>{p.discount}%</td>
+                            <td>{p.price} VND</td>
                             <td style={{width: '230px'}}>
                               <button className="btn btn-warning me-2">Edit</button>
                               {
