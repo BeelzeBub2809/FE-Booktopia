@@ -171,7 +171,10 @@ function ComboProductPage() {
     }
   };
 
-console.log(combo);
+  const hasDiscount = combo.discount > 0;
+  const discountedPrice = hasDiscount
+    ? combo.price - (combo.price * combo.discount) / 100
+    : combo.price;
 
   return (
     <div className="product-page-container container mt-5">
@@ -232,12 +235,21 @@ console.log(combo);
             <b>Rating: </b> 5
           </p>
           <h3 className="product-price">
-            <b className="product-price-new">{combo.price} VND</b>
-            <del className="product-price-old">{combo.price}</del> VND
-            <span className="product-discount">(20% off)</span>
+            {hasDiscount ? (
+              <>
+                <b className="product-price-new">
+                Price: {discountedPrice.toFixed(0)} VND
+                </b>
+                <del className="product-price-old"> {combo.price} VND</del>
+                <span className="product-discount">
+                  ({combo.discount}% off)
+                </span>
+              </>
+            ) : (
+              <b className="product-price-new">Price: {combo.price} VND</b>
+            )}
           </h3>
           <div className="product-action-buttons">
-            <button className="btn btn-primary">Add to wishlist</button>
             <button
               className="btn btn-warning"
               onClick={() => handleAddToCart(combo._id)}

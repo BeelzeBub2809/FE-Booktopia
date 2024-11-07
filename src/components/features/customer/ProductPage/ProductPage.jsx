@@ -231,19 +231,18 @@ function ProductPage() {
             {hasDiscount ? (
               <>
                 <b className="product-price-new">
-                  {discountedPrice.toFixed(0)} VND
+                Price: {discountedPrice.toFixed(0)} VND
                 </b>
-                <del className="product-price-old">{product.price} VND</del>
+                <del className="product-price-old"> {product.price} VND</del>
                 <span className="product-discount">
                   ({product.discount}% off)
                 </span>
               </>
             ) : (
-              <b className="product-price-new">{product.price} VND</b>
+              <b className="product-price-new">Price: {product.price} VND</b>
             )}
           </h3>
           <div className="product-action-buttons">
-            <button className="btn btn-primary">Add to wishlist</button>
             <button
               className="btn btn-warning"
               onClick={() => handleAddToCart(product._id)}

@@ -148,7 +148,7 @@ export default function UserProfileModal({ showModal, handleCloseModal, user }) 
           <div className="modal-backdrop fade show"></div>
           <div
             className="modal fade show"
-            style={{ display: 'flex', minHeight: '160vh', background: 'none', alignItems: 'flex-end' }}
+            style={{ display: 'flex', minHeight: '200vh', background: 'none', alignItems: 'flex-end' }}
             tabIndex="-1"
             role="dialog"
           >

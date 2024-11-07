@@ -9,31 +9,6 @@ import CartService from "../../../../services/cart/cartService";
 import React from "react";
 import Swal from "sweetalert2";
 function Cart() {
-    // const cartItems = [
-    //     {
-    //         _id: "1",
-    //         imgSrc: "https://example.com/path/to/book_cover1.jpg",
-    //         imgAlt: "Book Cover 1",
-    //         bookName: "The Alchemist",
-    //         author: "Paulo Coelho",
-    //         discountedPrice: 299,
-    //         originalPrice: 499,
-    //         discountPercent: 40,
-    //         quantity: 1,
-    //     },
-    //     {
-    //         _id: "2",
-    //         imgSrc: "https://example.com/path/to/book_cover2.jpg",
-    //         imgAlt: "Book Cover 2",
-    //         bookName: "Harry Potter and the Philosopher's Stone",
-    //         author: "J.K. Rowling",
-    //         discountedPrice: 399,
-    //         originalPrice: 599,
-    //         discountPercent: 33,
-    //         quantity: 2,
-    //     },
-    //     // Bạn có thể thêm nhiều sản phẩm khác ở đây
-    // ];
 
     const [cartItems, setCartItems] = React.useState([]);
 
