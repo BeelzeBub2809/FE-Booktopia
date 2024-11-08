@@ -10,6 +10,7 @@ import Select from 'react-select';
 import { ValidatorsControl } from '../../../../../utils/validators-control';
 import { Rules } from '../../../../../utils/rules';
 export default function EditDiscountModal({ showModal, handleCloseModal, item }) {
+	const [key, setKey] = useState(0);
 	const [products, setProducts] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const [loading, setLoading] = useState(true); 
@@ -37,7 +38,6 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
   };
 
   useEffect(() => {
-
 	setLoading(true);
     fetch("http://localhost:9999/api/category")
 			.then(response => response.json())
@@ -74,7 +74,7 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 			});
 			const product = products.find(p => p._id === item.productId._id);
 			setSelectedProduct(product);
-			
+		setKey(item.productId ? 1 : 0);	
     }
   }, [item]);
   
@@ -98,45 +98,61 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 
 	const handleSubmit = async (e) => {
 		let formControl = new ValidatorsControl({
-			discount: { value: selectedItem.discount, validators: Rules.discount},
 			startDate: { value: selectedItem.startDate, validators: Rules.date},
 			endDate: { value: selectedItem.endDate, validators: Rules.date},
-			minOrderPrice: { value: selectedItem.minOrderPrice, validators: Rules.number},
-			maxOrderPrice: { value: selectedItem.maxOrderPrice, validators: Rules.number},
-		  })
-		  let isSubmit = formControl.submitForm(e);
-		  if(!isSubmit) return;
-		  if(selectedProduct === null) {
-			Swal.fire({
-			  title: 'Error',
-			  text: 'Please select one product',
-			  icon: 'error',
-			  confirmButtonText: 'Ok'
-			});
-			return;
-		  }
-		  if(selectedItem.startDate > selectedItem.endDate) {
-			Swal.fire({
-			  title: 'Error',
-			  text: 'Start date must be less than End date',
-			  icon: 'error',
-			  confirmButtonText: 'Ok'
-			});
-			return;
-		  }
-		  if(selectedItem.minOrderPrice > selectedItem.maxOrderPrice) {
-			Swal.fire({
-			  title: 'Error',
-			  text: 'Min order price must be less than Max order price',
-			  icon: 'error',
-			  confirmButtonText: 'Ok'
-			});
-			return;
-		  }
+		})
+		if(key == 0){
+			formControl.setField('discount', selectedItem.discount, Rules.discount);
+		} else if (key == 1){
+			formControl.setField('minOrderPrice', selectedItem.minOrderPrice, Rules.number);
+			formControl.setField('maxOrderPrice', selectedItem.maxOrderPrice, Rules.number);
+		}
 
+		let isSubmit = formControl.submitForm(e);
+		if(!isSubmit) return;
+
+		if(selectedItem.startDate > selectedItem.endDate) {
+			Swal.fire({
+				title: 'Error',
+				text: 'Start date must be less than End date',
+				icon: 'error',
+				confirmButtonText: 'Ok'
+			});
+			return;
+		}
+		if( key == 0 && selectedProduct === null) {
+			Swal.fire({
+				title: 'Error',
+				text: 'Please select one product',
+				icon: 'error',
+				confirmButtonText: 'Ok'
+			});
+			return;
+		}
+		if( key == 1 && selectedItem.minOrderPrice > selectedItem.maxOrderPrice) {
+			Swal.fire({
+				title: 'Error',
+				text: 'Min order price must be less than Max order price',
+				icon: 'error',
+				confirmButtonText: 'Ok'
+			});
+			return;
+		}
 
 		try {
-			const res = await DiscountService.updateDiscount(selectedItem);
+
+			let editCondition = {
+				_id: selectedItem._id,
+				startDate: selectedItem.startDate,
+				endDate: selectedItem.endDate,
+			}
+			if(key == 0){
+				editCondition = { ...editCondition, productId: selectedItem.productId, discount: selectedItem.discount }
+			} else if (key == 1){
+				editCondition = { ...editCondition, minOrderPrice: selectedItem.minOrderPrice, maxOrderPrice: selectedItem.maxOrderPrice }
+			}
+			
+			const res = await DiscountService.updateDiscount(editCondition);
 			Swal.fire({
 				title: `successfully`,
 				text: res.message,
@@ -168,15 +184,34 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 					<div className="modal-backdrop fade show"></div>
 					<div className="modal fade show" style={{ display: 'flex', width: '600px', minHeight: '120vh', background: 'none', alignItems: 'flex-end' }} tabIndex="-1" role='dialog'>
 					<div className="modal-dialog modal-lg modal-dialog-centered" role='document' style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-						<div className="modal-content" style={{ width: '100vw', height: '90vh'}}>
+						<div className="modal-content" style={{ width: '400px', height: '90vh'}}>
 								<div className="modal-header">
 									<h5 className="modal-title">Edit discount</h5>
 								</div>
 								<div className="modal-body">
-									<div className="d-flex" style={{ gap: '0px' }}>
-										<div className='d-flex' style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
+									<div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
+										<div className='d-flex flex-column' style={{margin: '5px'}}>
+											<label>Start Date</label>
+											<input style={{ height: '38px', width:'10vw'}} type="date" className="form-control" value={selectedItem.startDate} name="startDate" onChange={handleChange} />
+											<div validation="startDate" className="error-message" style={{ color: 'red' }} alias="Start Date"></div>
+										</div>
+										<div className='d-flex flex-column' style={{margin: '5px'}}>
+											<label>End Date</label>
+											<input style={{ height: '38px', width:'10vw' }} type="date" className="form-control" value={selectedItem.endDate} name="endDate" onChange={handleChange} />
+											<div validation="endDate" className="error-message" style={{ color: 'red' }} alias="End Date"></div>
+										</div>
+									</div>
+
+									<Tabs id="controlled-tab-example" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
+										<Tab eventKey={0} title="Discount product">
+										<div className='d-flex' style={{ width: '100%', flexDirection: 'column', alignItems: 'center' }}>
+											<div className="form-group mb-3 d-flex flex-column text-start text-dark " style={{width: '90%'}}>
+												<label>Discount</label>
+												<input style={{ height: '38px'}} type="text" className="form-control" value={item.discount} name="discount" onChange={handleChange} />
+												<div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
+											</div>
 											<div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{width: '90%'}}>
-												<div className="mt-3">
+												<div className="mt-2">
 													<label className="form-label text-dark">Select cateogory</label>
 													<Select
 														options={[{ value: '', label: 'All' }, ...categories.map((c) => ({ value: c._id, label: c.name }))]}
@@ -184,10 +219,9 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 														placeholder="Select an option..."
 														styles={customStyles}
 														defaultValue={{ value: '', label: 'All' }}
-														onChange={(selectedOption) => setSelectedCategoryId(selectedOption.value)}
-													/>
+														onChange={(selectedOption) => setSelectedCategoryId(selectedOption.value)}/>
 												</div>
-												<Form.Group className="mt-3">
+												<Form.Group className="mt-2">
 													<Form.Label>Search Products</Form.Label>
 													<Form.Control
 														type="text"
@@ -195,20 +229,23 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 														value={searchNameProduct}
 														onChange={handleSearchProduct}/>
 												</Form.Group>
-												<Form.Group className="mt-3">
+												<Form.Group className="mt-2">
 													<Form.Label style={{marginRight:'10px'}}>Select Products</Form.Label>
 													<div className='d-flex flex-column' style={customProductStyles}>
 														{ 
-															products && products.filter((p) => 
-																p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
-																	&& (selectedCategoryId === '' ||  p.categoryId.some(cate => cate._id == selectedCategoryId)))
-																.map((p) => (
-																	<Button
-																		key={p._id}
-																		variant={ selectedProduct !== null && selectedProduct._id === p._id ? 'success' : 'secondary'}
-																		onClick={() => handleProductSelect(p)}
-																		className="m-1">
+														products && products.filter((p) => 
+															p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
+															&& (selectedCategoryId === '' || p.categoryId.some(cate => cate._id == selectedCategoryId)))
+															.map((p) => (
+																<Button 
+																	key={p._id}
+																	variant={ selectedProduct !== null && selectedProduct._id === p._id ? 'success' : 'secondary'}
+																	onClick={() => handleProductSelect(p)}
+																	className='d-flex flex-row mt-2'>
+																	<img src={p.image[0]} alt="Product" style={{ width: '34px', height: '34px', objectFit: 'cover' }} />
+																	<div style={{margin:'auto'}}>
 																		{p.name}
+																	</div>
 																</Button>
 															))
 														}
@@ -216,51 +253,24 @@ export default function EditDiscountModal({ showModal, handleCloseModal, item })
 												</Form.Group>
 											</div>
 										</div>
-										
-										<form className="w-100">
-											<div className="form-group mb-3 d-flex flex-column text-start text-dark mt-4">
-												<label>Discount</label>
-												<input style={{ height: '38px'}} type="text" className="form-control" value={selectedItem.discount} name="discount" onChange={handleChange} />
-												<div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
-											</div>
-
-											<div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-												<div className='d-flex flex-column' style={{margin: '5px'}}>
-													<label>Start Date</label>
-													<input style={{ height: '38px', width:'10vw'}} type="date" className="form-control" value={selectedItem.startDate} name="startDate" onChange={handleChange} />
-													<div validation="startDate" className="error-message" style={{ color: 'red' }} alias="Start Date"></div>
-												</div>
-
-												<div className='d-flex flex-column' style={{margin: '5px'}}>
-													<label>End Date</label>
-													<input style={{ height: '38px', width:'10vw' }} type="date" className="form-control" value={selectedItem.endDate} name="endDate" onChange={handleChange} />
-													<div validation="endDate" className="error-message" style={{ color: 'red' }} alias="End Date"></div>
-												</div>
-											</div>
-
-											<div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-												<div className='d-flex flex-column' style={{margin: '5px'}}>
-													<label>Min order price</label>
-													<input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={selectedItem.minOrderPrice} name="minOrderPrice" onChange={handleChange} />
-													<div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Min order number"></div>
-												</div>
-												<div className='d-flex flex-column' style={{margin: '5px'}}>
-													<label>Max order price</label>
-													<input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={selectedItem.maxOrderPrice} name="maxOrderPrice" onChange={handleChange} />
-													<div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Max order number"></div>
-												</div>
-											</div>
-
-											<div className="form-group mb-3 d-flex flex-column text-start text-dark">
-												{selectedProduct && selectedProduct.image && selectedProduct.image.length > 0 && (
-													<div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
-														<img src={selectedProduct.image[0]} alt="Product" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
+										</Tab>
+										<Tab eventKey={1} title="Discount order">
+											<form className="w-100">
+													<div className='d-flex flex-column' style={{margin: '5px', width: '100%vw'}}>
+														<label>Min order price</label>
+														<input style={{ height: '38px'}} type="text" className="form-control" value={selectedItem.minOrderPrice} name="minOrderPrice" onChange={handleChange} />
+														<div validation="minOrderPrice" className="error-message" style={{ color: 'red' }} alias="Min order number"></div>
 													</div>
-												)}
-											</div>
-
-										</form>
-									</div>
+													<div className='d-flex flex-column' style={{margin: '5px', width: '100%vw'}}>
+														<label>Max discount price</label>
+														<input style={{ height: '38px'}} type="text" className="form-control" value={selectedItem.maxOrderPrice} name="maxOrderPrice" onChange={handleChange} />
+														<div validation="maxOrderPrice" className="error-message" style={{ color: 'red'}} alias="Max order number"></div>
+													</div>
+													<div className="form-group mb-3 d-flex flex-column text-start text-dark">
+												</div>
+											</form>
+										</Tab>
+									</Tabs>
 								</div>
 								<div className="modal-footer">
 									<button type="button" className="btn btn-secondary btn-small" onClick={handleCloseModal} style={{ backgroundColor: "gray" }}>Close</button>
@@ -288,6 +298,6 @@ export const customStyles = {
   };
   
   export const customProductStyles = {
-    maxHeight: '250px',
+    maxHeight: '180px',
     overflowY: 'auto', 
   };
