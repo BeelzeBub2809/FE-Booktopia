@@ -7,7 +7,7 @@ const Validators = {
     email: value => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value) ? null : { email: true },
     phoneNumber: value => value && value.trim().length === 10  && /^0\d{9}$/.test(value) ? null : { phoneNumber: true},
     password: value => value && value.trim().length > 0 && /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value) ? null : { password: true },
-    number: value => value && /^\d+(\.\d{1,2})?$/.test(value) ? null : { price: true },
+    number: value => value && /^\d+(\.\d{1,2})?$/.test(value) ? null : { number: true },
     maxNumber: max => value => value <= max ? null : { maxNumber: max}, 
     minNumber: min => value => value >= min ? null : { maxNumber: min}, 
     isbn: value => value && /^(?:\d{9}X|\d{10}|\d{3}[- ]?\d{1,5}[- ]?\d{1,7}[- ]?\d{1,7}[- ]?\d{1})$/.test(value) ? null : { isbn: true },

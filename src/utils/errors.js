@@ -8,7 +8,7 @@ export const Errors = {
     password: ':field must contain at least one number, one letter and one special character',
     youtubeLink: ':field is not correct',
     isbn: ':field is not correct format',
-    price: ':field must be a number',
+    number: ':field must be a number',
     maxNumber: ':field must be less than {error}',
     minNumber: ':field must be higher than {error}',
     validDate: ':field is not correct format of date',

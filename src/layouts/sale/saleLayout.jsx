@@ -6,12 +6,14 @@ import ProductSale from '../../components/features/sale/Product/productSale';
 import OrderSale from '../../components/features/sale/Order/orderSale';
 import ComboSale from '../../components/features/sale/Combo/comboSale';
 import DiscountSale from '../../components/features/sale/Discount/discountSale';
+import DashboardSale from '../../components/features/sale/Dashboard/dashboardSale';
 const SaleLayout = () => {
   return (
     <div>
       <HeaderEmp />
       <SideBarEmp />
       <Routes>
+        <Route path="/" element={<DashboardSale/>} />
         <Route path="/product" element={<ProductSale />} />
         <Route path="/category" element={<CategorySale />} />
         <Route path="/order" element={<OrderSale/>} />

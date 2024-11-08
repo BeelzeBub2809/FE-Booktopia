@@ -29,7 +29,7 @@ function SideBarEmp() {
           // Default items for other roles
           <>
             <li className="nav-item">
-              <a className="nav-link collapsed" href="#">
+              <a className="nav-link collapsed" href="/sale">
                 <i className="bi bi-grid"></i>
                 <span>Dashboard</span>
               </a>

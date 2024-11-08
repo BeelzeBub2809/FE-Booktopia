@@ -9,6 +9,7 @@ import ProductService from '../../../../../services/product/productService';
 import { ValidatorsControl } from '../../../../../utils/validators-control';
 import { Rules } from '../../../../../utils/rules';
 export default function AddDiscountModal({ showModal, handleCloseModal }) {
+  const [key, setKey] = useState(0);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true); 
@@ -82,23 +83,19 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
 
   const handleSubmit = async (e) => {
     let formControl = new ValidatorsControl({
-      discount: { value: item.discount, validators: Rules.discount},
       startDate: { value: item.startDate, validators: Rules.date},
       endDate: { value: item.endDate, validators: Rules.date},
-      minOrderPrice: { value: item.minOrderPrice, validators: Rules.number},
-      maxOrderPrice: { value: item.maxOrderPrice, validators: Rules.number},
     })
+    if(key == 0){
+      formControl.setField('discount', item.discount, Rules.discount);
+    } else if (key == 1){
+      formControl.setField('minOrderPrice', item.minOrderPrice, Rules.number);
+      formControl.setField('maxOrderPrice', item.maxOrderPrice, Rules.number);
+    }
+
     let isSubmit = formControl.submitForm(e);
     if(!isSubmit) return;
-    if(selectedProduct === null) {
-      Swal.fire({
-        title: 'Error',
-        text: 'Please select one product',
-        icon: 'error',
-        confirmButtonText: 'Ok'
-      });
-      return;
-    }
+
     if(item.startDate > item.endDate) {
       Swal.fire({
         title: 'Error',
@@ -108,7 +105,16 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
       });
       return;
     }
-    if(item.minOrderPrice > item.maxOrderPrice) {
+    if( key == 0 && selectedProduct === null) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Please select one product',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+    if( key == 1 && item.minOrderPrice > item.maxOrderPrice) {
       Swal.fire({
         title: 'Error',
         text: 'Min order price must be less than Max order price',
@@ -118,7 +124,17 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
       return;
     }
     try {
-      const res = await DiscountService.createDiscount(item);
+      let createCondition = {
+        startDate: item.startDate,
+        endDate: item.endDate,
+      }
+      if(key == 0){
+        createCondition = { ...createCondition, productId: item.productId, discount: item.discount }
+      } else if (key == 1){
+        createCondition = { ...createCondition, minOrderPrice: item.minOrderPrice, maxOrderPrice: item.maxOrderPrice }
+      }
+
+      const res = await DiscountService.createDiscount(createCondition);
       Swal.fire({
         title: `successfully`,
         text: res.message,
@@ -150,99 +166,93 @@ export default function AddDiscountModal({ showModal, handleCloseModal }) {
           <div className="modal-backdrop fade show"></div>
           <div className="modal fade show" style={{ display: 'flex', width: '600px', minHeight: '120vh', background: 'none', alignItems: 'flex-end' }} tabIndex="-1" role='dialog'>
           <div className="modal-dialog modal-lg modal-dialog-centered" role='document' style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <div className="modal-content" style={{ width: '100vw', height: '90vh'}}>
+            <div className="modal-content" style={{ width: '400px', height: '90vh'}}>
                 <div className="modal-header">
                   <h5 className="modal-title">Add discount</h5>
                 </div>
                 <div className="modal-body">
-                  <div className="d-flex" style={{ gap: '0px' }}>
-                    <div className='d-flex' style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
-                      <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{width: '90%'}}>
-                          <div className="mt-3">
-                            <label className="form-label text-dark">Select cateogory</label>
-                            <Select
-                              options={[{ value: '', label: 'All' }, ...categories.map((c) => ({ value: c._id, label: c.name }))]}
-                              isSearchable
-                              placeholder="Select an option..."
-                              styles={customStyles}
-                              defaultValue={{ value: '', label: 'All' }}
-                              onChange={(selectedOption) => setSelectedCategoryId(selectedOption.value)}
-                            />
-                          </div>
-                          <Form.Group className="mt-3">
-                            <Form.Label>Search Products</Form.Label>
-                            <Form.Control
-                              type="text"
-                              style={{ height: '38px' }}
-                              value={searchNameProduct}
-                              onChange={handleSearchProduct}/>
-                          </Form.Group>
-                          <Form.Group className="mt-3">
-                            <Form.Label style={{marginRight:'10px'}}>Select Products</Form.Label>
-                            <div className='d-flex flex-column' style={customProductStyles}>
-                              { 
-                                products && products.filter((p) => 
-                                  p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
-                                    && (selectedCategoryId === '' || p.categoryId.some(cate => cate._id == selectedCategoryId)))
-                                  .map((p) => (
-                                    <Button
-                                      key={p._id}
-                                      variant={ selectedProduct !== null && selectedProduct._id === p._id ? 'success' : 'secondary'}
-                                      onClick={() => handleProductSelect(p)}
-                                      className="m-1">
-                                      {p.name}
-                                  </Button>
-                                ))
-                              }
-                            </div>
-                          </Form.Group>
-                      </div>
+                  <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
+                    <div className='d-flex flex-column' style={{margin: '5px'}}>
+                      <label>Start Date</label>
+                      <input style={{ height: '38px', width:'10vw'}} type="date" className="form-control" value={item.startDate} name="startDate" onChange={handleChange} />
+                      <div validation="startDate" className="error-message" style={{ color: 'red' }} alias="Start Date"></div>
                     </div>
-                    
-                    <form className="w-100">
-                      <div className="form-group mb-3 d-flex flex-column text-start text-dark mt-4">
-                        <label>Discount</label>
-                        <input style={{ height: '38px'}} type="text" className="form-control" value={item.discount} name="discount" onChange={handleChange} />
-                        <div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
-                      </div>
 
-                      <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                        <div className='d-flex flex-column' style={{margin: '5px'}}>
-                          <label>Start Date</label>
-                          <input style={{ height: '38px', width:'10vw'}} type="date" className="form-control" value={item.startDate} name="startDate" onChange={handleChange} />
-                          <div validation="startDate" className="error-message" style={{ color: 'red' }} alias="Start Date"></div>
-                        </div>
-
-                        <div className='d-flex flex-column' style={{margin: '5px'}}>
-                          <label>End Date</label>
-                          <input style={{ height: '38px', width:'10vw' }} type="date" className="form-control" value={item.endDate} name="endDate" onChange={handleChange} />
-                          <div validation="endDate" className="error-message" style={{ color: 'red' }} alias="End Date"></div>
-                        </div>
-                      </div>
-
-                      <div className="form-group mb-3 d-flex flex-row text-start text-dark justify-content-between">
-                        <div className='d-flex flex-column' style={{margin: '5px'}}>
-                          <label>Min order price</label>
-                          <input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={item.minOrderPrice} name="minOrderPrice" onChange={handleChange} />
-                          <div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Min order number"></div>
-                        </div>
-                        <div className='d-flex flex-column' style={{margin: '5px'}}>
-                          <label>Max order price</label>
-                          <input style={{ height: '38px', width:'10vw' }} type="text" className="form-control" value={item.maxOrderPrice} name="maxOrderPrice" onChange={handleChange} />
-                          <div validation="minOrderNumber" className="error-message" style={{ color: 'red' }} alias="Max order number"></div>
-                        </div>
-                      </div>
-
-                      <div className="form-group mb-3 d-flex flex-column text-start text-dark">
-                        {selectedProduct && selectedProduct.image && selectedProduct.image.length > 0 && (
-                          <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{ width: '80%', flexDirection: 'column', alignItems: 'center' }}>
-                            <img src={selectedProduct.image[0]} alt="Product" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
-                          </div>
-                        )}
-                      </div>
-
-                    </form>
+                    <div className='d-flex flex-column' style={{margin: '5px'}}>
+                      <label>End Date</label>
+                      <input style={{ height: '38px', width:'10vw' }} type="date" className="form-control" value={item.endDate} name="endDate" onChange={handleChange} />
+                      <div validation="endDate" className="error-message" style={{ color: 'red' }} alias="End Date"></div>
+                    </div>
                   </div>
+
+                  <Tabs id="controlled-tab-example" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
+                    <Tab eventKey={0} title="Discount product">
+                      <div className='d-flex' style={{ width: '100%', flexDirection: 'column', alignItems: 'center' }}>
+                        <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{width: '90%'}}>
+                          <label>Discount</label>
+                          <input style={{ height: '38px'}} type="text" className="form-control" value={item.discount} name="discount" onChange={handleChange} />
+                          <div validation="discount" className="error-message" style={{ color: 'red' }} alias="Discount"></div>
+                        </div>
+                        <div className="form-group mb-3 d-flex flex-column text-start text-dark" style={{width: '90%'}}>
+                            <div className="mt-2">
+                              <label className="form-label text-dark">Select cateogory</label>
+                              <Select
+                                options={[{ value: '', label: 'All' }, ...categories.map((c) => ({ value: c._id, label: c.name }))]}
+                                isSearchable
+                                placeholder="Select an option..."
+                                styles={customStyles}
+                                defaultValue={{ value: '', label: 'All' }}
+                                onChange={(selectedOption) => setSelectedCategoryId(selectedOption.value)}
+                              />
+                            </div>
+                            <Form.Group className="mt-2">
+                              <Form.Label>Search Products</Form.Label>
+                              <Form.Control
+                                type="text"
+                                style={{ height: '38px' }}
+                                value={searchNameProduct}
+                                onChange={handleSearchProduct}/>
+                            </Form.Group>
+                            <Form.Group className="mt-2">
+                              <Form.Label style={{marginRight:'10px'}}>Select Products</Form.Label>
+                              <div className='d-flex flex-column' style={customProductStyles}>
+                                { 
+                                  products && products.filter((p) => 
+                                    p.name.toLowerCase().includes(searchNameProduct.toLowerCase()) 
+                                      && (selectedCategoryId === '' || p.categoryId.some(cate => cate._id == selectedCategoryId)))
+                                    .map((p) => (
+                                      <Button 
+                                        key={p._id}
+                                        variant={ selectedProduct !== null && selectedProduct._id === p._id ? 'success' : 'secondary'}
+                                        onClick={() => handleProductSelect(p)}
+                                        className='d-flex flex-row mt-2'>
+                                        <img src={p.image[0]} alt="Product" style={{ width: '34px', height: '34px', objectFit: 'cover' }} />
+                                        <div style={{margin:'auto'}}>
+                                          {p.name}
+                                        </div>
+                                    </Button>
+                                  ))
+                                }
+                              </div>
+                            </Form.Group>
+                        </div>
+                      </div>
+                    </Tab>
+                    <Tab eventKey={1} title="Discount order">
+                      <form className="w-100">
+                          <div className='d-flex flex-column' style={{margin: '5px', width: '100%vw'}}>
+                            <label>Min order price</label>
+                            <input style={{ height: '38px'}} type="text" className="form-control" value={item.minOrderPrice} name="minOrderPrice" onChange={handleChange} />
+                            <div validation="minOrderPrice" className="error-message" style={{ color: 'red' }} alias="Min order number"></div>
+                          </div>
+                          <div className='d-flex flex-column' style={{margin: '5px', width: '100%vw'}}>
+                            <label>Max discount price</label>
+                            <input style={{ height: '38px'}} type="text" className="form-control" value={item.maxOrderPrice} name="maxOrderPrice" onChange={handleChange} />
+                            <div validation="maxOrderPrice" className="error-message" style={{ color: 'red' }} alias="Max order number"></div>
+                          </div>
+                      </form>
+                    </Tab>
+                  </Tabs>
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary btn-small" onClick={handleCloseModal} style={{ backgroundColor: "gray" }}>Close</button>
@@ -270,6 +280,6 @@ export const customStyles = {
 };
 
 export const customProductStyles = {
-  maxHeight: '250px',
+  maxHeight: '180px',
   overflowY: 'auto', 
 };
