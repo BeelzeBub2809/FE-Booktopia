@@ -45,15 +45,15 @@ function Header() {
 
   const handleSearch = async (event) => {
     const value = event.target.value;
-    setSearchTerm(value);
-
-    if (value) {
+    setSearchTerm(value); // Update state without trimming
+  
+    if (value.trim()) { // Check if there is a non-empty input after trimming
       try {
         const response = await fetch(
-          `http://localhost:9999/api/product/search?name=${value}`
+          `http://localhost:9999/api/product/search?name=${encodeURIComponent(value.trim())}`
         );
         const result = await response.json();
-
+  
         if (result.status === "success" && Array.isArray(result.data)) {
           setSearchResults(result.data);
         } else {
@@ -67,6 +67,7 @@ function Header() {
       setSearchResults([]);
     }
   };
+  
 
   const handleShowProfileModal = () => setShowProfileModal(true);
   const handleCloseProfileModal = () => setShowProfileModal(false);
