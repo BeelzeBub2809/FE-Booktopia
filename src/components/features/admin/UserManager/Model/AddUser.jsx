@@ -10,7 +10,7 @@ export default function AddUserModal({ showModal, handleCloseModal }) {
     email: '',
     phone: '',
     address: '',
-    role: 'customer', // Default role
+    role: '', // Initialize role as an empty string to hold roleId
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function AddUserModal({ showModal, handleCloseModal }) {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch("http://localhost:9999/api/auth/signup", {
+      const res = await fetch("http://localhost:9999/api/user/", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,6 +62,7 @@ export default function AddUserModal({ showModal, handleCloseModal }) {
       });
     }
   };
+  console.log(user);
 
   return (
     <>
@@ -102,8 +103,9 @@ export default function AddUserModal({ showModal, handleCloseModal }) {
                   <div className="form-group mb-3">
                     <label>Role</label>
                     <select className="form-control" name="role" value={user.role} onChange={handleChange}>
+                      <option value="">Select role</option>
                       {roles.map(role => (
-                        <option key={role._id} value={role._id}>{role.role}</option> // Adjust according to the role object structure
+                        <option key={role._id} value={role.role}>{role.role}</option> // Passing role._id as the value
                       ))}
                     </select>
                   </div>
