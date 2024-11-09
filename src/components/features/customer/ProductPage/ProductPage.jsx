@@ -254,74 +254,78 @@ function ProductPage() {
       </div>
 
       <div className="container mt-5">
-        <h3>Product Reviews</h3>
-        <div className="review-list p-3">
-          {reviews.length > 0 ? (
-            reviews.map((review) => (
-              <div key={review._id} className="review-item">
-                <div className="review-header">
-                  <strong>{review.customerId.userId.userName}</strong>
-                  <span className="rating">
-                    {"⭐".repeat(review.rating)}
-                  </span>
-                  {review.customerId.userId._id ===
-                    localStorage.getItem("userId").replace(/"/g, "") && (
-                    <button
-                      className="btn btn-danger btn-sm ms-2 float-end"
-                      onClick={() => handleDeleteReview(review._id)}
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  )}
-                </div>
-                <p>{review.content}</p>
+      <h3>Product Reviews</h3>
+      <div className="review-list p-3">
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="review-item">
+              <div className="review-header">
+                <strong>{review.customerId.userId.userName}</strong>
+                <span className="rating">{"⭐".repeat(review.rating)}</span>
+                {review.customerId.userId._id === localStorage.getItem("userId")?.replace(/"/g, "") && (
+                  <button
+                    className="btn btn-danger btn-sm ms-2 float-end"
+                    onClick={() => handleDeleteReview(review._id)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                )}
               </div>
-            ))
-          ) : (
-            <p>No reviews available</p>
-          )}
-        </div>
-
-        <h4>Write a Review</h4>
-        <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
-          <div className="mb-3">
-            <label htmlFor="comment" className="form-label">
-              Your Comment
-            </label>
-            <textarea
-              className="form-control"
-              id="comment"
-              rows="3"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your comment here"
-              required
-            ></textarea>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="rating" className="form-label">
-              Rating
-            </label>
-            <select
-              id="rating"
-              className="form-control"
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-              required
-            >
-              <option value="">Select rating</option>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>
-                  {star} Star{star > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Submit Review
-          </button>
-        </form>
+              <p>{review.content}</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews available</p>
+        )}
       </div>
+    
+      {localStorage.getItem("userId") ? (
+        <>
+          <h4>Write a Review</h4>
+          <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
+            <div className="mb-3">
+              <label htmlFor="comment" className="form-label">
+                Your Comment
+              </label>
+              <textarea
+                className="form-control"
+                id="comment"
+                rows="3"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your comment here"
+                required
+              ></textarea>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="rating" className="form-label">
+                Rating
+              </label>
+              <select
+                id="rating"
+                className="form-control"
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+                required
+              >
+                <option value="">Select rating</option>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <option key={star} value={star}>
+                    {star} Star{star > 1 ? "s" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Submit Review
+            </button>
+          </form>
+        </>
+      ) : (
+        <p>Please log in to post a review.</p>
+      )}
+    </div>
+    
 
       <div className="related-books-section">
       <h3>Related Books</h3>
