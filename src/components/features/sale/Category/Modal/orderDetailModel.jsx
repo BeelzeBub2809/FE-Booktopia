@@ -40,25 +40,38 @@ function OrderDetailModal({ orderDetail, isOpen, onClose }) {
 
               <h6 className="mt-4">Product Information</h6>
               {OrderDetail.map((detail) => {
-                const { _id: detailId, amount, price, productInfo } = detail;
+                const { _id: detailId, amount, price, productInfo, comboInfo } = detail;
+                const info = productInfo || comboInfo; // Use productInfo if it exists, otherwise use comboInfo
 
                 return (
                   <div key={detailId} className="mt-2 d-flex align-items-start">
-                    <img src={productInfo.image[0]} alt={productInfo.name} className="img-fluid" style={{ width: '120px', height: 'auto', marginRight: '15px' }} />
+                    <img src={info.image[0]} alt={info.name} className="img-fluid" style={{ width: '120px', height: 'auto', marginRight: '15px' }} />
                     <div className="product-info">
                       <ul className="list-group">
-                        <li className="list-group-item"><strong>Product Name:</strong> {productInfo.name}</li>
-                        <li className="list-group-item"><strong>ISBN:</strong> {productInfo.isbn}</li>
-                        <li className="list-group-item"><strong>Price:</strong> {productInfo.price}</li>
-                        <li className="list-group-item"><strong>Amount:</strong> {amount}</li>
-                        <li className="list-group-item"><strong>Quantity In Stock:</strong> {productInfo.quantityInStock}</li>
-                        <li className="list-group-item"><strong>Sold:</strong> {productInfo.sold}</li>
-                        <li className="list-group-item"><strong>Status:</strong> {productInfo.status}</li>
+                        <li className="list-group-item"><strong>Product Name:</strong> {info.name}</li>
+                        {productInfo ? (
+                          <>
+                            <li className="list-group-item"><strong>ISBN:</strong> {productInfo.isbn}</li>
+                            <li className="list-group-item"><strong>Price:</strong> {productInfo.price}</li>
+                            <li className="list-group-item"><strong>Amount:</strong> {amount}</li>
+                            <li className="list-group-item"><strong>Quantity In Stock:</strong> {productInfo.quantityInStock}</li>
+                            <li className="list-group-item"><strong>Sold:</strong> {productInfo.sold}</li>
+                            <li className="list-group-item"><strong>Status:</strong> {productInfo.status}</li>
+                          </>
+                        ) : (
+                          <>
+                            <li className="list-group-item"><strong>Price:</strong> {comboInfo.price}</li>
+                            <li className="list-group-item"><strong>Discount:</strong> {comboInfo.discount}%</li>
+                            <li className="list-group-item"><strong>Quantity:</strong> {comboInfo.quantity}</li>
+                            <li className="list-group-item"><strong>Status:</strong> {comboInfo.status}</li>
+                          </>
+                        )}
                       </ul>
                     </div>
                   </div>
                 );
               })}
+
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>

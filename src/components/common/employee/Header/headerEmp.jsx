@@ -1,10 +1,21 @@
 import React from 'react';
 import './headerEmp.css';
 import UserProfileModal from '../../modal/userProfileModal';
+import { useNavigate } from 'react-router-dom';
 function HeaderEmp() {
   const [showProfileModal, setShowProfileModal] = React.useState(false);
   const handleShowProfileModal = () => setShowProfileModal(true);
   const handleCloseProfileModal = () => setShowProfileModal(false);
+  const navigation = useNavigate();
+  const handleLogout = async () => {
+    await fetch("http://localhost:9999/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userRoles");
+    navigation("/login-res");
+  };
   return (
     <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -47,7 +58,7 @@ function HeaderEmp() {
                 <hr class="dropdown-divider" />
               </li>
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="#">
+                <a class="dropdown-item d-flex align-items-center" href="#" onClick={handleLogout}>
                   <i class="bi bi-box-arrow-right"></i>
                   <span>Sign Out</span>
                 </a>

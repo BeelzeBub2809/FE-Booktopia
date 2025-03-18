@@ -6,10 +6,17 @@ import Swal from "sweetalert2";
 function ShoppingBill({ cartItems }) {
   const [paymentMethod, setPaymentMethod] = React.useState("cod");
   const [deliveryCharges, setDeliveryCharges] = React.useState(0);
-  const finalBillBeforeDiscount =
-    cartItems.reduce((total, cartItem) => {
+  const finalBillBeforeDiscount = cartItems.reduce((total, cartItem) => {
+    if (cartItem.productId) {
+      // If it's a single product
       return total + cartItem.productId.price * (cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount);
-    }, 0)
+    } else if (cartItem.comboId) {
+      // If it's a combo product
+      return total + cartItem.comboId.price * (1 - cartItem.comboId.discount/100) * cartItem.amount;
+    }
+    return total; // In case neither productId nor comboId is present
+  }, 0);
+  
 
   let finalBill = 0;
   const totalDiscount = finalBillBeforeDiscount > 500000 ? 0.2 : 0;
@@ -27,15 +34,29 @@ function ShoppingBill({ cartItems }) {
   const [detailAddress, setDetailAddress] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [fullName, setFullName] = React.useState('');
-  const formattedProducts = cartItems.map(item => ({
-    productId: item.productId._id,
-    quantity: item.amount > item.productId.quantityInStock ? item.productId.quantityInStock.toString() : item.amount.toString(),
-    total_price: (item.productId.price * (item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount)),
-    type: 'single'
-  }));
+  const formattedProducts = cartItems.map(item => {
+    if (item.productId) {
+      return {
+        productId: item.productId._id,
+        quantity: item.amount > item.productId.quantityInStock ? item.productId.quantityInStock.toString() : item.amount.toString(),
+        discount: item.productId.discount || 0,
+        price: item.productId.price * (item.amount > item.productId.quantityInStock ? item.productId.quantityInStock : item.amount) * (1 - item.productId.discount/100 || 1),
+        type: 'single'
+      };
+    } else if (item.comboId) {
+      return {
+        comboId: item.comboId._id,
+        quantity: item.amount.toString(),
+        discount: item.comboId.discount,
+        price: item.comboId.price * (1 - item.comboId.discount/100) * item.amount,
+        type: 'combo'
+      };
+    }
+    return null;
+  })
 
-
-  const isFormComplete = selectedProvince && selectedDistrict && selectedWard && detailAddress && phone && fullName;
+  const isPhoneValid = /^0\d{9}$/.test(phone);
+  const isFormComplete = selectedProvince && selectedDistrict && selectedWard && detailAddress && isPhoneValid && fullName;
   const handlePreviewOrder = async () => {
     const requestData = {
       products: formattedProducts,
@@ -88,7 +109,7 @@ function ShoppingBill({ cartItems }) {
       receiver_ward_name: selectedWard ? selectedWard.label : '',
       receiver_district_name: selectedDistrict ? selectedDistrict.label : '',
       receiver_province_name: selectedProvince ? selectedProvince.label : '',
-      payment_type_id: 2,
+      payment_type_id: paymentMethod === "cod" ? 2 : 1,
       total_price: finalBill,
       total_discount: totalDiscount,
     };
@@ -96,7 +117,7 @@ function ShoppingBill({ cartItems }) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Please fill in all required fields',
+        text: 'Please fill in all required fields or fill in right formats',
       });
     } else {
       const apiUrl = paymentMethod === "cod"
@@ -208,19 +229,35 @@ function ShoppingBill({ cartItems }) {
 
       <hr />
       {cartItems.map((cartItem) => {
-        return (
-          <div key={cartItem.productId._id} className="cart-price-container">
-            <div className="cart-item-bookname">
-              <p>{cartItem.productId.name}</p>
+        if (cartItem.productId) {
+          return (
+            <div key={cartItem.productId._id} className="cart-price-container">
+              <div className="cart-item-bookname">
+                <p>{cartItem.productId.name}</p>
+              </div>
+              <div className="cart-item-quantity">
+                <p>X {cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount}</p>
+              </div>
+              <div className="cart-item-total-price" id="price-sum">
+                <p>{cartItem.productId.price * (cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount) * (1 - cartItem.productId.discount/100 || 1)} VND</p>
+              </div>
             </div>
-            <div className="cart-item-quantity">
-              <p>X {cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount}</p>
+          );
+        } else {
+          return (
+            <div key={cartItem.comboId._id} className="cart-price-container">
+              <div className="cart-item-bookname">
+                <p>{cartItem.comboId.name}</p>
+              </div>
+              <div className="cart-item-quantity">
+                <p>X {cartItem.amount}</p>
+              </div>
+              <div className="cart-item-total-price" id="price-sum">
+                <p>{cartItem.comboId.price * (1 - cartItem.comboId.discount/100) * cartItem.amount} VND</p>
+              </div>
             </div>
-            <div className="cart-item-total-price" id="price-sum">
-              <p>{cartItem.productId.price * (cartItem.amount > cartItem.productId.quantityInStock ? cartItem.productId.quantityInStock : cartItem.amount)} VND</p>
-            </div>
-          </div>
-        );
+          );
+        }
       })}
 
       <div className="address-container">

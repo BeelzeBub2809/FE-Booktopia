@@ -26,9 +26,14 @@ function Cart() {
         fetchCart();
     }, []);
 
-    const handleRemoveItem = async (productId) => {
+    const handleRemoveItem = async (productId, comboId) => {
         try {
-            const response = await CartService.removeFromCart(productId);
+            let response
+            if (productId) {
+               response = await CartService.removeFromCart(productId, null);
+            } else {
+               response = await CartService.removeFromCart(null, comboId);
+            }
             Swal.fire({
                 title: 'Success',
                 text: response.message,
@@ -56,12 +61,20 @@ function Cart() {
         }
     }
 
-    const handleChangeQuantity = async (productId, quantity, action) => {
+    const handleChangeQuantity = async (productId, quantity, action, comboId) => {
         try {
             if(action === 'input') {
-                const response = await CartService.changeQuantity({ productId, quantity });
+                if (productId) {
+                    await CartService.changeQuantity({ productId, quantity });
+                } else {
+                    await CartService.changeQuantity({ comboId, quantity });
+                }
             } else {
-                const response = await CartService.changeQuantity({ productId, quantity: quantity + (action === 'add' ? 1 : -1) });
+                if (productId) {
+                    await CartService.changeQuantity({ productId, quantity: quantity + (action === 'add' ? 1 : -1) });
+                } else {
+                    await CartService.changeQuantity({ comboId, quantity: quantity + (action === 'add' ? 1 : -1) });
+                }
             }
             
             const fetchCart = async () => {

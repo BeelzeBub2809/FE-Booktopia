@@ -35,3 +35,7 @@
     border-radius: 50%;
     border: 1px solid var(--dull-grey);
 }
+
+.cart-item-book-img{
+    max-width: 190px;
+}

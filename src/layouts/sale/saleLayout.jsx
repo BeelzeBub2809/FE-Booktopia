@@ -7,6 +7,7 @@ import OrderSale from '../../components/features/sale/Order/orderSale';
 import ComboSale from '../../components/features/sale/Combo/comboSale';
 import DiscountSale from '../../components/features/sale/Discount/discountSale';
 import DashboardSale from '../../components/features/sale/Dashboard/dashboardSale';
+import RefundSale from '../../components/features/sale/Refund/refundSale';
 const SaleLayout = () => {
   return (
     <div>
@@ -19,6 +20,7 @@ const SaleLayout = () => {
         <Route path="/order" element={<OrderSale/>} />
         <Route path="/combo" element={<ComboSale/>} />
         <Route path="/discount" element={<DiscountSale />} />
+        <Route path='/refund' element={<RefundSale/>} />
       </Routes>
     </div>
   );

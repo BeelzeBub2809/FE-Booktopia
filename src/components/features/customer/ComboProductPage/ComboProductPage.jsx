@@ -70,9 +70,9 @@ function ComboProductPage() {
   if (error) return <div>Error: {error}</div>;
   if (!combo) return <div>No product found.</div>;
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (comboId) => {
     try {
-      const res = await CartService.addToCart({ productId });
+      const res = await CartService.addComboToCart({ comboId });
       Swal.fire({
         title: "Success",
         text: res.message,
@@ -96,12 +96,12 @@ function ComboProductPage() {
       prev === 0 ? combo.image.length - 1 : prev - 1
     );
 
-    const relatedBooks = combo && combo.categoryId && combo.categoryId.length > 0
+  const relatedBooks = combo && combo.categoryId && combo.categoryId.length > 0
     ? allBook.filter((b) => {
-        console.log('Product category IDs:', combo.categoryId);
-        console.log('Book categories:', b.category);
-        return b.category.some((cat) => combo.categoryId.includes(cat._id));
-      })
+      console.log('Product category IDs:', combo.categoryId);
+      console.log('Book categories:', b.category);
+      return b.category.some((cat) => combo.categoryId.includes(cat._id));
+    })
     : [];
 
   const handleReviewSubmit = async (e) => {
@@ -149,12 +149,12 @@ function ComboProductPage() {
       const res = await fetch(`http://localhost:9999/api/review/${reviewId}`, {
         method: "DELETE",
       });
-  
+
       if (!res.ok) throw new Error("Failed to delete the review.");
-      
+
       // Fetch updated reviews after deletion
       await fetchReviews(); // Call the function to fetch reviews again
-  
+
       Swal.fire({
         title: "Success",
         text: "Review deleted successfully",
@@ -200,9 +200,8 @@ function ComboProductPage() {
               {combo.image.map((imgSrc, index) => (
                 <img
                   key={index}
-                  className={`thumbnail-image ${
-                    index === currentImageIndex ? "active-thumbnail" : ""
-                  }`}
+                  className={`thumbnail-image ${index === currentImageIndex ? "active-thumbnail" : ""
+                    }`}
                   src={imgSrc}
                   alt={`${combo.name} thumbnail ${index + 1}`}
                   onClick={() => setCurrentImageIndex(index)}
@@ -224,8 +223,8 @@ function ComboProductPage() {
           <h2 className="product-name">{combo.name}</h2>
           <hr />
           <p className="product-author">
-          {combo.productId.map((product) => (
-            <span key={product._id}>{product.author} , </span>
+            {combo.productId.map((product) => (
+              <span key={product._id}>{product.author} , </span>
             ))}
           </p>
           <p className="product-description">
@@ -238,7 +237,7 @@ function ComboProductPage() {
             {hasDiscount ? (
               <>
                 <b className="product-price-new">
-                Price: {discountedPrice.toFixed(0)} VND
+                  Price: {discountedPrice.toFixed(0)} VND
                 </b>
                 <del className="product-price-old"> {combo.price} VND</del>
                 <span className="product-discount">
@@ -261,97 +260,56 @@ function ComboProductPage() {
       </div>
 
       <div className="related-books-section">
-      <h3>Combo Include</h3>
-      <div className="combo-books-list">
-        {combo.productId.length > 0 ? (
+        <h3>Combo Include</h3>
+        <div className="combo-books-list">
+          {combo.productId.length > 0 ? (
             combo.productId.map((book, index) => (
-            <div key={index} className="related-book-card">
-              <Link to={`/shop/${book._id}`}>
-                <img
-                  className="related-book-image"
-                  src={book.image || bookCover}
-                  alt={book.name}
-                />
-              </Link>
-              <h4>{book.name}</h4>
-              <p>by {book.author}</p>
-            </div>
-          ))
-        ) : (
-          <p>No related books found</p>
-        )}
+              <div key={index} className="related-book-card">
+                <Link to={`/shop/${book._id}`}>
+                  <img
+                    className="related-book-image"
+                    src={book.image || bookCover}
+                    alt={book.name}
+                  />
+                </Link>
+                <h4>{book.name}</h4>
+                <p>by {book.author}</p>
+              </div>
+            ))
+          ) : (
+            <p>No related books found</p>
+          )}
+        </div>
       </div>
-    </div>
 
       {/* Reviews Section */}
       <div className="container mt-5">
         <h3>Product Reviews</h3>
         <div className="review-list p-3">
-        {reviews.length > 0 ? (
-          reviews.map((review) => (
-            <div key={review._id} className="review-item">
-              <div className="review-header">
-                <strong>{review.customerId.userId.userName}</strong>
-                <span className="rating">{"⭐".repeat(review.rating)}</span>
-                {/* Check if the review belongs to the current user */}
-                {review.customerId.userId._id === localStorage.getItem("userId").replace(/"/g, '') && (
-                  <button
-                  className="btn btn-danger btn-sm ms-2 float-end"
-                  onClick={() => handleDeleteReview(review._id)}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </button>
-                
-                )}
-              </div>
-              <p>{review.content}</p>
-            </div>
-          ))
-        ) : (
-          <p>No reviews available</p>
-        )}
-      </div>
-      
+          {reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review._id} className="review-item">
+                <div className="review-header">
+                  <strong>{review.customerId.userId.userName}</strong>
+                  <span className="rating">{"⭐".repeat(review.rating)}</span>
+                  {/* Check if the review belongs to the current user */}
+                  {review.customerId.userId._id === localStorage.getItem("userId").replace(/"/g, '') && (
+                    <button
+                      className="btn btn-danger btn-sm ms-2 float-end"
+                      onClick={() => handleDeleteReview(review._id)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
 
-        <h4>Write a Review</h4>
-        <form onSubmit={handleReviewSubmit} className="mt-3 p-3">
-          <div className="mb-3">
-            <label htmlFor="comment" className="form-label">
-              Your Comment
-            </label>
-            <textarea
-              className="form-control"
-              id="comment"
-              rows="3"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your comment here"
-              required
-            ></textarea>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="rating" className="form-label">
-              Rating
-            </label>
-            <select
-              id="rating"
-              className="form-control"
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-              required
-            >
-              <option value="">Select rating</option>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>
-                  {star} Star{star > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Submit Review
-          </button>
-        </form>
+                  )}
+                </div>
+                <p>{review.content}</p>
+              </div>
+            ))
+          ) : (
+            <p>No reviews available</p>
+          )}
+        </div>
       </div>
 
       {/* Related Books Section */}
@@ -381,4 +339,4 @@ function ComboProductPage() {
   );
 }
 
-export {ComboProductPage};
+export { ComboProductPage };

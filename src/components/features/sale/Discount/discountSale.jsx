@@ -110,7 +110,6 @@ function DiscountSale() {
                   <table className="table datatable text-center align-middle">
                     <thead>
                       <tr>
-                        <th className='text-center align-middle'>Image</th>
                         <th className='text-center align-middle'>Product Name</th>
                         <th className='text-center align-middle'>Discount</th>
                         <th className='text-center align-middle'>Min Order Price</th>
@@ -124,14 +123,7 @@ function DiscountSale() {
                     {
                       data?.map((p, index) => (
                         <tr key={index}>
-                          <td> 
-                            {p.productId.image && p.productId.image.length > 0 ? (
-                              <img src={p.productId.image[0]} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                            ) : (
-                              <img src={IMAGE_DEFAULT} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                            )}
-                          </td>
-                          <td>{p.productId.name}</td>
+                          <td>{p.productId?.name}</td>
                           <td>{p.discount}</td>
                           <td>{p.minOrderPrice}</td>
                           <td>{p.maxOrderPrice}</td>

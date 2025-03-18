@@ -59,7 +59,7 @@ function SideBarEmp() {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link collapsed" href="pages-faq.html">
+              <a className="nav-link collapsed" href="/sale/refund">
                 <i className="bi bi-arrow-clockwise"></i>
                 <span>Refund</span>
               </a>

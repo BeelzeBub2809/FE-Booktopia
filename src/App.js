@@ -1,32 +1,47 @@
 import './App.css';
-import { useEffect, useLayoutEffect } from 'react';
-import axios from "axios"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import CustomerLayout from './layouts/customer/customerLayout.jsx'
-import { 
-  Header
-} from "./index.js"
+import CustomerLayout from './layouts/customer/customerLayout.jsx';
 import SaleLayout from './layouts/sale/saleLayout.jsx';
 import MarketerLayout from './layouts/marketer/marketerLayout.jsx';
-import NoAccessPage from './components/common/auth/errorPage/noPermission.jsx';
 import AdminLayout from './layouts/admin/adminLayout.jsx';
+import NoAccessPage from './components/common/auth/errorPage/noPermission.jsx';
 import PrivateRoute from './components/common/auth/privateRoute/privateRoute.jsx';
 
 function App() {
-
-  // const { userLoggedIn } = useUserLogin()
-  // const { dispatchUserWishlist } = useWishlist()
-  // const { dispatchUserCart } = useCart()
-
-
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/*" element={<CustomerLayout/>} />
-          <Route path='/sale/*' element={<SaleLayout/>} />
-          <Route path='marketer/*' element={<MarketerLayout/>} />
-          <Route path='admin/*' element={<AdminLayout/>} />
+          <Route path="/*" element={<CustomerLayout />} />
+          
+          <Route
+            path="/sale/*"
+            element={
+              <PrivateRoute
+                element={<SaleLayout />}
+                allowedRoles={['sale']}
+              />
+            }
+          />
+          <Route
+            path="/marketer/*"
+            element={
+              <PrivateRoute
+                element={<MarketerLayout />}
+                allowedRoles={['marketer']}
+              />
+            }
+          />
+          <Route
+            path="/admin/*"
+            element={
+              <PrivateRoute
+                element={<AdminLayout />}
+                allowedRoles={['admin']}
+              />
+            }
+          />
+
           <Route path="/no-access" element={<NoAccessPage />} />
         </Routes>
       </div>

@@ -1,19 +1,40 @@
 import React, { useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Navbar, Nav } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Chart, registerables } from 'chart.js';
 import './dashboardSale.css';
+import SaleDashboardServices from '../../../../services/dashboard/saleDashboard';
 Chart.register(...registerables);
 
 function DashboardSale() {
+  const [stockInTotal, setStockInTotal] = React.useState(0);
+  const [stockOutTotal, setStockOutTotal] = React.useState(0);
+  const [totalRevenue, setTotalRevenue] = React.useState(0);
+
+  const fetchData = async () => {
+    try {
+      const stockInTotal = await SaleDashboardServices.getStockInTotal('month');
+      const stockOutTotal = await SaleDashboardServices.getStockOutTotal('month');
+      const totalRevenue = await SaleDashboardServices.getProfit('month');
+
+      setStockInTotal(stockInTotal);
+      setStockOutTotal(stockOutTotal);
+      setTotalRevenue(totalRevenue);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
+    let salesChartInstance, pieChartInstance;
+
     const salesCtx = document.getElementById("salesChart").getContext("2d");
-    new Chart(salesCtx, {
+    salesChartInstance = new Chart(salesCtx, {
       type: "line",
       data: {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
         datasets: [{
           label: "Monthly Sales",
-          data: [65, 59, 80, 81, 56, 55],
+          data: [totalRevenue, 0, 0, 0, 0, 0],
           borderColor: "rgb(13, 110, 253)",
           backgroundColor: "rgba(13, 110, 253, 0.1)",
           fill: true,
@@ -44,7 +65,7 @@ function DashboardSale() {
     });
 
     const pieCtx = document.getElementById("pieChart").getContext("2d");
-    new Chart(pieCtx, {
+    pieChartInstance = new Chart(pieCtx, {
       type: "doughnut",
       data: {
         labels: ["Online", "In-Store", "Phone"],
@@ -68,6 +89,14 @@ function DashboardSale() {
         }
       }
     });
+
+    fetchData();
+
+    // Cleanup function to destroy the chart instances on component unmount or re-render
+    return () => {
+      if (salesChartInstance) salesChartInstance.destroy();
+      if (pieChartInstance) pieChartInstance.destroy();
+    };
   }, []);
 
   return (
@@ -92,14 +121,13 @@ function DashboardSale() {
           </div>
 
           <Row className="g-4 mb-4">
-            <Col xl={3} md={6}>
+            <Col xl={4} md={6}>
               <Card className="border-primary h-100">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <h6 className="mb-0 text-primary">Total Revenue</h6>
-                      <h2 className="mb-0">$124,500</h2>
-                      <small className="text-success">+15% from last month</small>
+                      <h2 className="mb-0">{totalRevenue.$numberDecimal || totalRevenue || 0} VND</h2>
                     </div>
                     <i className="bi bi-currency-dollar fs-1 text-primary"></i>
                   </div>
@@ -107,14 +135,13 @@ function DashboardSale() {
               </Card>
             </Col>
 
-            <Col xl={3} md={6}>
+            <Col xl={4} md={6}>
               <Card className="border-success h-100">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h6 className="mb-0 text-success">Total Orders</h6>
-                      <h2 className="mb-0">854</h2>
-                      <small className="text-success">+8% from last month</small>
+                      <h6 className="mb-0 text-success">Stock in total</h6>
+                      <h2 className="mb-0">{stockInTotal.$numberDecimal || 0} VND</h2>
                     </div>
                     <i className="bi bi-cart-check fs-1 text-success"></i>
                   </div>
@@ -122,31 +149,15 @@ function DashboardSale() {
               </Card>
             </Col>
 
-            <Col xl={3} md={6}>
+            <Col xl={4} md={6}>
               <Card className="border-warning h-100">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h6 className="mb-0 text-warning">Average Order</h6>
-                      <h2 className="mb-0">$145.80</h2>
-                      <small className="text-danger">-2% from last month</small>
+                      <h6 className="mb-0 text-warning">Stock out total</h6>
+                      <h2 className="mb-0">{stockOutTotal.$numberDecimal || 0} VND</h2>
                     </div>
                     <i className="bi bi-graph-up fs-1 text-warning"></i>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col xl={3} md={6}>
-              <Card className="border-info h-100">
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h6 className="mb-0 text-info">Total Customers</h6>
-                      <h2 className="mb-0">1,245</h2>
-                      <small className="text-success">+12% from last month</small>
-                    </div>
-                    <i className="bi bi-people fs-1 text-info"></i>
                   </div>
                 </Card.Body>
               </Card>

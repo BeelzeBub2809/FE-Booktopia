@@ -135,9 +135,9 @@ function OrderSale() {
                 <table className="table datatable text-center align-middle">
                   <thead>
                     <tr>
+                      <th className='text-center align-middle'>ID</th>
                       <th className='text-center align-middle'>Name</th>
                       <th className='text-center align-middle'>Phone</th>
-                      <th className='text-center align-middle'>Address</th>
                       <th className='text-center align-middle'>Order date</th>
                       <th className='text-center align-middle'>Delivery Code</th>
                       <th className='text-center align-middle'>Status</th>
@@ -146,10 +146,10 @@ function OrderSale() {
                   </thead>
                   <tbody>
                     {orders.map((order, index) => (
-                      <tr key={index} data-index={index}>
+                      <tr key={order._id} data-index={index}>
+                        <td>{order._id}</td>
                         <td>{order.receiver_name}</td>
                         <td>{order.receiver_phone}</td>
-                        <td>{order.receiver_address}, {order.receiver_ward_name}, {order.receiver_district_name}, {order.receiver_province_name}</td>
                         <td>{new Date(order.createDate).toLocaleDateString()}</td>
                         <td>{order.delivery_code || ""}</td>
                         <td>{order.status}</td>
